@@ -1506,7 +1506,7 @@ function renderAdmin() {
     return;
   }
   document.getElementById('admin-table').innerHTML = DB.users.map(function(u) {
-    return '<div class="row" style="cursor:pointer;" onclick="showAdminUserModal(\u0027' + u.id + '\u0027)"><div><div class="name">' + u.username + (DB.currentUser.id === u.id ? '\uff08\u4f60\uff09' : '') + '</div><div class="email">' + (u.email || '\u672a\u8bbe\u90ae\u7bb1') + '</div></div><span class="role \u0027 + u.role + \u0027>' + (u.role === 'admin' ? '\u7ba1\u7406\u5458' : '\u7528\u6237') + '</span></div>';
+    return '<div class="row" style="cursor:pointer;" onclick="showAdminUserModal(\u0027' + u.id + '\u0027)"><div><div class="name">' + u.username + (DB.currentUser.id === u.id ? '\uff08\u4f60\uff09' : '') + '</div><div class="email">' + (u.email || '\u672a\u8bbe\u90ae\u7bb1') + '</div></div><span class="role ' + u.role + '">' + (u.role === 'admin' ? '\u7ba1\u7406\u5458' : '\u7528\u6237') + '</span></div>';
   }).join('');
 }
 

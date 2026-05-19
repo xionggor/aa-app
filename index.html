@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AA记账</title>
 <style>
-/* ============================================
-   全局 & 主题
-   ============================================ */
 :root {
   --bg: #f5f6f8;
   --card: #ffffff;
@@ -25,8 +22,7 @@
   --shadow: 0 1px 8px rgba(0,0,0,0.06);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
-
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
@@ -34,14 +30,10 @@ body {
   padding-bottom: 80px;
   min-height: 100vh;
 }
-
-/* 隐藏所有页面，JS 控制显示 */
 .page { display: none; }
 .page.active { display: block; }
 
-/* ============================================
-   通用组件
-   ============================================ */
+/* ========== 通用组件 ========== */
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 14px 24px; border: none; border-radius: var(--radius);
@@ -53,8 +45,6 @@ body {
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 .btn-success { background: var(--success); color: #fff; }
-.btn-ghost { background: transparent; color: var(--primary); font-weight: 500; }
-
 .input {
   width: 100%; padding: 14px 16px;
   border: 2px solid var(--border); border-radius: var(--radius-sm);
@@ -62,13 +52,11 @@ body {
   transition: border-color .2s;
 }
 .input:focus { border-color: var(--primary); }
-
 .card {
   background: var(--card); border-radius: var(--radius);
   padding: 16px; margin-bottom: 12px;
   box-shadow: var(--shadow);
 }
-
 .header {
   position: sticky; top: 0; z-index: 10;
   background: rgba(245,246,248,0.92);
@@ -77,26 +65,12 @@ body {
   display: flex; align-items: center; gap: 12px;
   border-bottom: 1px solid var(--border);
 }
-.header h1 {
-  font-size: 17px; font-weight: 600; flex: 1;
-  color: var(--text);
-}
-.header .back {
-  font-size: 22px; cursor: pointer; padding: 4px 4px 4px 0;
-  border: none; background: none; color: var(--primary);
-}
-
+.header h1 { font-size: 17px; font-weight: 600; flex: 1; color: var(--text); }
+.header .back { font-size: 22px; cursor: pointer; padding: 4px 4px 4px 0; border: none; background: none; color: var(--primary); }
 .badge {
   display: inline-block; padding: 3px 10px; border-radius: 20px;
   font-size: 12px; font-weight: 600;
 }
-.badge-food { background: #fff2e0; color: #e68a00; }
-.badge-transport { background: #e0f0ff; color: #007aff; }
-.badge-hotel { background: #e8f5e9; color: #2e7d32; }
-.badge-ticket { background: #fce4ec; color: #c62828; }
-.badge-shopping { background: #f3e5f5; color: #7b1fa2; }
-.badge-other { background: #f5f5f5; color: #666; }
-
 .tabs {
   display: flex; gap: 0; background: var(--card);
   border-radius: var(--radius); overflow: hidden;
@@ -109,36 +83,17 @@ body {
 }
 .tab.active { background: var(--primary); color: #fff; font-weight: 600; }
 
-/* ============================================
-   Page: Login
-   ============================================ */
-#page-login {
-  padding: 60px 24px 0;
-  min-height: 100vh;
-}
-#page-login .inner {
-  display: flex; flex-direction: column; max-width: 400px; margin: 0 auto;
-}
-#page-login .logo {
-  font-size: 42px; text-align: center; margin-bottom: 8px;
-}
-#page-login h2 {
-  text-align: center; font-size: 28px; margin-bottom: 4px;
-}
-#page-login p.sub {
-  text-align: center; color: var(--text-secondary); margin-bottom: 40px;
-}
+/* ========== Login ========== */
+#page-login { padding: 60px 24px 0; min-height: 100vh; }
+#page-login .inner { display: flex; flex-direction: column; max-width: 400px; margin: 0 auto; }
+#page-login .logo { font-size: 42px; text-align: center; margin-bottom: 8px; }
+#page-login h2 { text-align: center; font-size: 28px; margin-bottom: 4px; }
+#page-login p.sub { text-align: center; color: var(--text-secondary); margin-bottom: 40px; }
 #page-login .input { margin-bottom: 12px; }
 #page-login .btn { margin-bottom: 12px; }
-#page-login .switch-link {
-  text-align: center; font-size: 14px; color: var(--primary);
-  cursor: pointer; margin-top: 8px;
-}
-#page-login .switch-link:active { opacity: .7; }
+#page-login .switch-link { text-align: center; font-size: 14px; color: var(--primary); cursor: pointer; margin-top: 8px; }
 
-/* ============================================
-   Page: Home
-   ============================================ */
+/* ========== Home ========== */
 #page-home .project-list { padding: 16px 20px; }
 .project-item {
   display: flex; align-items: center; gap: 12px;
@@ -147,44 +102,16 @@ body {
   box-shadow: var(--shadow); cursor: pointer; transition: all .15s;
 }
 .project-item:active { transform: scale(.97); opacity: .8; }
-.project-item .emoji {
-  width: 44px; height: 44px; border-radius: 12px;
-  background: var(--primary-light); display: flex;
-  align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
+.project-item .emoji { width: 44px; height: 44px; border-radius: 12px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 .project-item .info { flex: 1; min-width: 0; }
 .project-item .info h3 { font-size: 16px; font-weight: 600; color: var(--text); }
 .project-item .info p { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
 .project-item .amount { font-size: 18px; font-weight: 700; color: var(--primary); }
+.join-section { padding: 8px 20px 16px; display: flex; gap: 8px; }
+.join-section .input { flex: 1; padding: 12px 14px; font-size: 14px; border-radius: var(--radius); border: 2px solid var(--border); }
+.join-section .btn { width: auto; padding: 12px 20px; white-space: nowrap; border-radius: var(--radius); font-size: 14px; }
 
-.join-section {
-  padding: 8px 20px 16px;
-  display: flex; gap: 8px;
-}
-.join-section .input {
-  flex: 1; padding: 12px 14px; font-size: 14px;
-  border-radius: var(--radius); border: 2px solid var(--border);
-}
-.join-section .btn {
-  width: auto; padding: 12px 20px; white-space: nowrap;
-  border-radius: var(--radius); font-size: 14px;
-}
-
-.fab {
-  position: fixed; bottom: 32px; right: 20px;
-  width: 56px; height: 56px; border-radius: 50%;
-  background: var(--primary); color: #fff;
-  font-size: 28px; border: none; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,122,255,0.4);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 20; transition: transform .2s;
-}
-.fab:active { transform: scale(.9); }
-
-/* ============================================
-   Page: Room
-   ============================================ */
+/* ========== Room ========== */
 .room-summary {
   margin: 12px 16px; border-radius: 16px; padding: 20px;
   background: linear-gradient(135deg, #00b4d8, #0077b6);
@@ -197,49 +124,28 @@ body {
   background: rgba(255,255,255,.08);
   border-radius: 50%;
 }
-.room-summary .label-row {
-  display: flex; justify-content: space-between; align-items: center;
-}
-.room-summary .label-row .label {
-  font-size: 13px; opacity: .85;
-}
+.room-summary .label-row { display: flex; justify-content: space-between; align-items: center; }
+.room-summary .label-row .label { font-size: 13px; opacity: .85; }
 .room-summary .label-row .settle-btn {
   font-size: 13px; opacity: .9; cursor: pointer;
   display: flex; align-items: center; gap: 4px;
   background: rgba(255,255,255,.2); padding: 6px 12px;
   border-radius: 20px; border: none; color: #fff;
 }
-.room-summary .amount-row {
-  display: flex; align-items: baseline; gap: 4px; margin-top: 8px;
-}
-.room-summary .amount-row .currency {
-  font-size: 16px; opacity: .85;
-}
-.room-summary .amount-row .total {
-  font-size: 40px; font-weight: 800; letter-spacing: -1px;
-}
-.room-summary .per-person {
-  font-size: 13px; opacity: .7; margin-top: 4px;
-}
-.room-summary .members {
-  display: flex; gap: -4px; margin-top: 14px;
-}
+.room-summary .amount-row { display: flex; align-items: baseline; gap: 4px; margin-top: 8px; }
+.room-summary .amount-row .currency { font-size: 16px; opacity: .85; }
+.room-summary .amount-row .total { font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+.room-summary .per-person { font-size: 13px; opacity: .7; margin-top: 4px; }
+.room-summary .members { display: flex; gap: -4px; margin-top: 14px; }
 .room-summary .members .avatar {
   width: 32px; height: 32px; border-radius: 50%;
   background: rgba(255,255,255,.25);
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 600; border: 2px solid rgba(255,255,255,.4);
-  margin-right: -6px;
+  margin-right: -6px; cursor: pointer;
 }
-
-.room-actions {
-  display: flex; gap: 8px; padding: 0 20px 12px;
-}
+.room-actions { display: flex; gap: 8px; padding: 0 20px 12px; }
 .room-actions .btn { flex: 1; font-size: 14px; padding: 12px; }
-
-.category-summary {
-  padding: 0 20px 12px;
-}
 
 .bill-item {
   display: flex; align-items: center; gap: 12px;
@@ -260,47 +166,48 @@ body {
 .bill-item .type-icon.shopping { background: #f3e5f5; }
 .bill-item .type-icon.other { background: #f5f5f5; }
 .bill-item .info { flex: 1; min-width: 0; }
-.bill-item .info .top {
-  display: flex; justify-content: space-between; align-items: center;
-}
+.bill-item .info .top { display: flex; justify-content: space-between; align-items: center; }
 .bill-item .info .top .name { font-weight: 600; font-size: 15px; color: var(--text); }
 .bill-item .info .top .cost { font-weight: 700; font-size: 16px; color: var(--text); }
 .bill-item .info .meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
 
-/* ============================================
-   Page: Add Bill
-   ============================================ */
+/* ========== Bill Form ========== */
 .bill-form { padding: 16px 20px; }
 .bill-form .amount-input {
   font-size: 48px; font-weight: 800; text-align: center;
   width: 100%; padding: 20px; border: none; background: transparent;
-  outline: none; color: var(--text);
+  outline: none; color: var(--text); pointer-events: none;
 }
 .bill-form .amount-hint { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
 .bill-form .label { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; margin-top: 16px; }
-.tag-grid {
-  display: flex; flex-wrap: wrap; gap: 8px;
-}
+.tag-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-grid .tag {
   padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border);
   background: #fff; font-size: 14px; cursor: pointer; transition: all .2s;
 }
 .tag-grid .tag.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
-.tag-grid .tag:active { transform: scale(.95); }
 
-.member-grid {
-  display: flex; flex-wrap: wrap; gap: 8px;
+/* 数字键盘 */
+.numpad {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
+  background: #d1d5db; padding: 6px 4px env(safe-area-inset-bottom, 8px);
+  display: none; grid-template-columns: repeat(4, 1fr); gap: 4px;
+  max-width: 500px; margin: 0 auto;
 }
-.member-grid .member-tag {
-  padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border);
-  background: #fff; font-size: 14px; cursor: pointer; transition: all .2s;
+.numpad-key {
+  height: 54px; border: none; border-radius: 8px;
+  font-size: 22px; font-weight: 500; cursor: pointer;
+  background: #fff; color: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .1s;
 }
-.member-grid .member-tag.selected { border-color: var(--success); background: #e8f8e8; color: var(--success); font-weight: 600; }
-.member-grid .member-tag:active { transform: scale(.95); }
+.numpad-key:active { background: #e5e5ea; }
+.numpad-key.fn { background: #a1a1aa; color: #fff; font-size: 16px; }
+.numpad-key.fn:active { background: #71717a; }
+.numpad-key.confirm { background: var(--primary); color: #fff; font-size: 16px; font-weight: 600; }
+.numpad-key.confirm:active { background: var(--primary-dark); }
+.numpad-key.dot { font-weight: 700; }
 
-/* ============================================
-   Bill Form v2 - 支付人 / 分摊人
-   ============================================ */
 .payer-row, .split-row {
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
   min-height: 44px; padding: 8px 12px;
@@ -322,26 +229,12 @@ body {
   cursor: pointer; transition: all .2s;
 }
 .add-circle:active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
-
-/* 全体成员勾选 */
-.split-all-check {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 0; font-size: 14px; cursor: pointer;
-}
+.split-all-check { display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 14px; cursor: pointer; }
 .split-all-check input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+.bill-section { margin-bottom: 16px; }
+.bill-section-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); padding: 8px 4px 4px; margin-bottom: 4px; }
 
-/* 账单分组 */
-.bill-section {
-  margin-bottom: 16px;
-}
-.bill-section-title {
-  font-size: 13px; font-weight: 600; color: var(--text-secondary);
-  padding: 8px 4px 4px; margin-bottom: 4px;
-}
-
-/* ============================================
-   Page: Settle
-   ============================================ */
+/* ========== Settle ========== */
 .settle-summary {
   padding: 20px; text-align: center;
   background: linear-gradient(135deg, #34c759, #007aff);
@@ -349,7 +242,6 @@ body {
 }
 .settle-summary .total { font-size: 36px; font-weight: 800; margin: 8px 0; }
 .settle-summary .per-person { font-size: 18px; opacity: .9; }
-
 .settle-detail { padding: 16px 20px; }
 .person-card {
   background: var(--card); border-radius: var(--radius);
@@ -365,7 +257,6 @@ body {
 .person-card .header .status.get { color: var(--danger); }
 .person-card .header .status.pay { color: var(--success); }
 .person-card .details { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
-
 .transfer-list { padding: 0 20px; }
 .transfer-item {
   display: flex; align-items: center; gap: 12px;
@@ -377,14 +268,9 @@ body {
 .transfer-item .to { font-weight: 600; }
 .transfer-item .amount { font-weight: 700; color: var(--primary); margin-left: auto; font-size: 18px; }
 
-/* ============================================
-   Page: Admin
-   ============================================ */
+/* ========== Admin ========== */
 .admin-table { padding: 16px 20px; }
-.admin-table .row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 0; border-bottom: 1px solid var(--border);
-}
+.admin-table .row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
 .admin-table .row:last-child { border-bottom: none; }
 .admin-table .row .name { font-weight: 500; }
 .admin-table .row .email { font-size: 12px; color: var(--text-secondary); }
@@ -392,21 +278,13 @@ body {
 .admin-table .row .role.admin { background: #fff2e0; color: #e68a00; }
 .admin-table .row .role.user { background: #f0f0f5; color: #666; }
 
-/* ============================================
-   Log page
-   ============================================ */
+/* ========== Logs ========== */
 .log-list { padding: 16px 20px; }
-.log-item {
-  padding: 10px 0; border-bottom: 1px solid var(--border);
-  font-size: 13px; line-height: 1.6;
-  display: flex; gap: 8px;
-}
+.log-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.6; display: flex; gap: 8px; }
 .log-item .time { color: var(--text-secondary); white-space: nowrap; min-width: 60px; }
 .log-item .content { flex: 1; }
 
-/* ============================================
-   Bottom Nav
-   ============================================ */
+/* ========== Bottom Nav ========== */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   height: 64px; background: rgba(255,255,255,0.95);
@@ -430,14 +308,13 @@ body {
   font-size: 28px; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 16px rgba(0,180,216,0.5);
-  margin-top: -20px; transition: transform .2s;
+  margin-top: -20px; transition: transform .2s, opacity .2s;
   position: relative;
 }
 .bottom-nav .nav-fab:active { transform: scale(.9); }
+.bottom-nav .nav-fab.hidden { opacity: 0; pointer-events: none; }
 
-/* ============================================
-   Modal / Overlay
-   ============================================ */
+/* ========== Modal ========== */
 .modal-overlay {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,.5); z-index: 200;
@@ -453,15 +330,18 @@ body {
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .modal-content h3 { font-size: 18px; margin-bottom: 16px; }
 
-/* ============================================
-   Pay method display
-   ============================================ */
-.pay-method {
-  background: #f8f8fa; border-radius: var(--radius-sm);
-  padding: 12px; margin-top: 8px; font-size: 13px;
-  display: flex; align-items: center; gap: 8px;
+/* ========== Avatar Picker ========== */
+.avatar-grid {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; padding: 8px 0;
 }
-.pay-method .label { color: var(--text-secondary); }
+.avatar-option {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; cursor: pointer; border: 3px solid transparent;
+  transition: all .2s;
+}
+.avatar-option.selected { border-color: var(--primary); transform: scale(1.1); }
+.avatar-option:active { transform: scale(.9); }
 
 /* Toast */
 .toast {
@@ -473,9 +353,6 @@ body {
 .toast.show { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
-/* ============================================
-   Responsive
-   ============================================ */
 @media (min-width: 600px) {
   body { max-width: 480px; margin: 0 auto; background: #e5e5ea; }
 }
@@ -483,83 +360,58 @@ body {
 </head>
 <body>
 
-<!-- ============================================
-     Toast
-     ============================================ -->
 <div id="toast" class="toast"></div>
 
-<!-- ============================================
-     Modal Overlay
-     ============================================ -->
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)this.classList.remove('show')">
-  <div class="modal-content" id="modal-content">
-  </div>
+  <div class="modal-content" id="modal-content"></div>
 </div>
 
-<!-- ============================================
-     PAGE: Login
-     ============================================ -->
+<!-- ========== PAGE: Login ========== -->
 <div id="page-login" class="page">
   <div class="inner">
-  <div class="logo">💰</div>
-  <h2>AA记账</h2>
-  <p class="sub">好友出游，分摊无忧</p>
-
-  <!-- Login form -->
-  <div id="login-form">
-    <input class="input" id="login-user" type="text" placeholder="用户名" autocomplete="username">
-    <input class="input" id="login-pass" type="password" placeholder="密码" autocomplete="current-password">
-    <button class="btn btn-primary" onclick="handleLogin()">登 录</button>
-    <div class="switch-link" onclick="showRegister()">没有账号？去注册</div>
-    <div class="switch-link" style="font-size:12px;color:var(--text-secondary);margin-top:4px;" onclick="showForgot()">忘记密码？</div>
-  </div>
-
-  <!-- Register form (hidden) -->
-  <div id="register-form" style="display:none;">
-    <input class="input" id="reg-user" type="text" placeholder="用户名">
-    <input class="input" id="reg-email" type="email" placeholder="邮箱（可选，用于找回密码）">
-    <input class="input" id="reg-pass" type="password" placeholder="密码">
-    <input class="input" id="reg-pass2" type="password" placeholder="确认密码">
-    <button class="btn btn-primary" onclick="handleRegister()">注 册</button>
-    <div class="switch-link" onclick="showLogin()">已有账号？去登录</div>
-  </div>
-
-  <!-- Forgot form (hidden) -->
-  <div id="forgot-form" style="display:none;">
-    <input class="input" id="forgot-email" type="email" placeholder="输入注册邮箱">
-    <button class="btn btn-primary" onclick="handleForgot()">发送重置邮件</button>
-    <div class="switch-link" onclick="showLogin()">返回登录</div>
-  </div>
+    <div class="logo">💰</div>
+    <h2>AA记账</h2>
+    <p class="sub">好友出游，分摊无忧</p>
+    <div id="login-form">
+      <input class="input" id="login-user" type="text" placeholder="用户名" autocomplete="username">
+      <input class="input" id="login-pass" type="password" placeholder="密码" autocomplete="current-password">
+      <button class="btn btn-primary" onclick="handleLogin()">登 录</button>
+      <div class="switch-link" onclick="showRegister()">没有账号？去注册</div>
+      <div class="switch-link" style="font-size:12px;color:var(--text-secondary);margin-top:4px;" onclick="showForgot()">忘记密码？</div>
+    </div>
+    <div id="register-form" style="display:none;">
+      <input class="input" id="reg-user" type="text" placeholder="用户名">
+      <input class="input" id="reg-email" type="email" placeholder="邮箱（可选）">
+      <input class="input" id="reg-pass" type="password" placeholder="密码">
+      <input class="input" id="reg-pass2" type="password" placeholder="确认密码">
+      <button class="btn btn-primary" onclick="handleRegister()">注 册</button>
+      <div class="switch-link" onclick="showLogin()">已有账号？去登录</div>
+    </div>
+    <div id="forgot-form" style="display:none;">
+      <input class="input" id="forgot-email" type="email" placeholder="输入注册邮箱">
+      <button class="btn btn-primary" onclick="handleForgot()">发送重置邮件</button>
+      <div class="switch-link" onclick="showLogin()">返回登录</div>
+    </div>
   </div>
 </div>
 
-<!-- ============================================
-     PAGE: Home (我的项目)
-     ============================================ -->
+<!-- ========== PAGE: Home ========== -->
 <div id="page-home" class="page">
   <div style="padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center;">
     <div>
       <div style="font-size:24px;font-weight:800;color:var(--text);">你好呀</div>
       <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="home-greeting"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="width:40px;height:40px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary);font-weight:600;" id="home-avatar">G</div>
-    </div>
+    <div style="width:40px;height:40px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary);font-weight:600;" id="home-avatar">G</div>
   </div>
-
   <div class="join-section">
     <input class="input" id="join-code" placeholder="输入分享码加入" style="text-transform:uppercase;">
     <button class="btn btn-primary" onclick="handleJoin()">加入</button>
   </div>
-
-  <div class="project-list" id="project-list">
-    <!-- 由 JS 渲染 -->
-  </div>
+  <div class="project-list" id="project-list"></div>
 </div>
 
-<!-- ============================================
-     PAGE: Create Project
-     ============================================ -->
+<!-- ========== PAGE: Create Project ========== -->
 <div id="page-project-new" class="page">
   <div class="header">
     <button class="back" onclick="navigate('#home')">←</button>
@@ -572,59 +424,41 @@ body {
   </div>
 </div>
 
-<!-- ============================================
-     PAGE: Room (项目房间)
-     ============================================ -->
+<!-- ========== PAGE: Room ========== -->
 <div id="page-room" class="page">
   <div class="header">
     <button class="back" onclick="navigate('#home')">←</button>
     <h1 id="room-title">项目名称</h1>
     <button style="border:none;background:none;font-size:14px;color:var(--primary);font-weight:600;" onclick="shareRoom()">分享</button>
   </div>
-
   <div class="room-summary">
     <div class="label-row">
       <span class="label">我的支出</span>
-      <button class="settle-btn" onclick="navigateToSettle()">
-        全员结算 →
-      </button>
+      <button class="settle-btn" onclick="navigateToSettle()">全员结算 →</button>
     </div>
     <div class="amount-row">
       <span class="currency">¥</span>
       <span class="total" id="room-total">0</span>
     </div>
     <div class="per-person" id="room-perperson">人均 ¥0</div>
-    <div id="room-category-summary" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
-    </div>
-    <div class="members" id="room-members">
-    </div>
+    <div id="room-category-summary" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <div class="members" id="room-members"></div>
   </div>
-
-  <div id="bill-list" style="padding:0 16px 80px;">
-    <!-- JS 渲染 -->
-  </div>
+  <div id="bill-list" style="padding:0 16px 80px;"></div>
 </div>
 
-<!-- ============================================
-     PAGE: Add Bill (记一笔)
-     ============================================ -->
+<!-- ========== PAGE: Add Bill ========== -->
 <div id="page-add-bill" class="page">
   <div class="header">
     <button class="back" onclick="navigateToRoom()">←</button>
     <h1>记一笔</h1>
   </div>
-
-  <!-- 步骤1: 金额 -->
   <div id="bill-step-amount" class="bill-form">
-    <input class="amount-input" id="bill-amount" type="number" inputmode="decimal" placeholder="0" step="0.01">
+    <div class="amount-input" id="bill-amount-display-main">0</div>
     <div class="amount-hint">输入支出金额</div>
-    <button class="btn btn-primary" onclick="billNextStep()">下一步</button>
   </div>
-
-  <!-- 步骤2: 详情 -->
   <div id="bill-step-detail" class="bill-form" style="display:none;">
     <div style="font-size:24px;font-weight:800;text-align:center;margin-bottom:16px;">¥<span id="bill-amount-display">0</span></div>
-
     <div class="label">标签</div>
     <div class="tag-grid" id="bill-tags">
       <span class="tag selected" data-tag="餐饮" onclick="selectTag(this)">🍜 餐饮</span>
@@ -634,23 +468,13 @@ body {
       <span class="tag" data-tag="购物" onclick="selectTag(this)">🛍️ 购物</span>
       <span class="tag" data-tag="其他" onclick="selectTag(this)">📦 其他</span>
     </div>
-
     <div class="label">支付人</div>
-    <div class="payer-row" id="bill-payer-row">
-      <!-- JS 渲染: 默认自己头像 + 加号 -->
-    </div>
-
+    <div class="payer-row" id="bill-payer-row"></div>
     <div class="label">分摊给</div>
-    <label class="split-all-check">
-      <input type="checkbox" id="bill-split-all" checked onchange="toggleSplitAll()"> 全体成员
-    </label>
-    <div class="split-row" id="bill-split-row" style="display:none;">
-      <!-- JS 渲染: 成员头像 + 加号 -->
-    </div>
-
+    <label class="split-all-check"><input type="checkbox" id="bill-split-all" checked onchange="toggleSplitAll()"> 全体成员</label>
+    <div class="split-row" id="bill-split-row" style="display:none;"></div>
     <div class="label">备注</div>
     <input class="input" id="bill-note" placeholder="如：火锅底料" style="margin-bottom:16px;">
-
     <div style="display:flex;gap:8px;">
       <button class="btn btn-outline" style="flex:1;" onclick="billSaveAndContinue()">继续记下一笔</button>
       <button class="btn btn-primary" style="flex:1;" onclick="billSaveAndBack()">保存并返回</button>
@@ -658,84 +482,57 @@ body {
   </div>
 </div>
 
-<!-- ============================================
-     PAGE: Settle (结算)
-     ============================================ -->
+<!-- ========== PAGE: Settle ========== -->
 <div id="page-settle" class="page">
   <div class="header">
     <button class="back" onclick="navigateToRoom()">←</button>
     <h1>结算</h1>
     <button style="border:none;background:none;font-size:14px;color:var(--primary);font-weight:600;" onclick="copySettleText()">复制</button>
   </div>
-
   <div class="settle-summary">
     <div style="font-size:13px;opacity:.8;">总支出</div>
     <div class="total" id="settle-total">¥0</div>
     <div class="per-person" id="settle-perperson">人均 ¥0</div>
   </div>
-
-  <div class="settle-detail" id="settle-detail">
-    <!-- JS 渲染每人详情 -->
-  </div>
-
-  <div style="padding:0 20px;">
-    <div class="label">💡 最少转账方案</div>
-  </div>
-  <div class="transfer-list" id="transfer-list">
-    <!-- JS 渲染 -->
-  </div>
-
+  <div class="settle-detail" id="settle-detail"></div>
+  <div style="padding:0 20px;"><div class="label">💡 最少转账方案</div></div>
+  <div class="transfer-list" id="transfer-list"></div>
   <div style="padding:16px 20px;">
     <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
-      <input type="checkbox" id="settle-done-check" onchange="toggleSettleDone()">
-      标记为已结算
+      <input type="checkbox" id="settle-done-check" onchange="toggleSettleDone()"> 标记为已结算
     </label>
   </div>
 </div>
 
-<!-- ============================================
-     PAGE: Bill Detail (账单详情)
-     ============================================ -->
+<!-- ========== PAGE: Bill Detail ========== -->
 <div id="page-bill-detail" class="page">
   <div class="header">
     <button class="back" onclick="navigateToRoom()">←</button>
     <h1>账单详情</h1>
     <button style="border:none;background:none;font-size:14px;color:var(--danger);font-weight:600;" onclick="deleteBill()">删除</button>
   </div>
-  <div id="bill-detail-content" style="padding:20px;">
-    <!-- JS 渲染 -->
-  </div>
+  <div id="bill-detail-content" style="padding:20px;"></div>
 </div>
 
-<!-- ============================================
-     PAGE: Logs (操作记录)
-     ============================================ -->
+<!-- ========== PAGE: Logs ========== -->
 <div id="page-logs" class="page">
   <div class="header">
     <button class="back" onclick="navigateToRoom()">←</button>
     <h1>操作记录</h1>
   </div>
-  <div class="log-list" id="log-list">
-    <!-- JS 渲染 -->
-  </div>
+  <div class="log-list" id="log-list"></div>
 </div>
 
-<!-- ============================================
-     PAGE: Admin
-     ============================================ -->
+<!-- ========== PAGE: Admin ========== -->
 <div id="page-admin" class="page">
   <div class="header">
     <button class="back" onclick="navigate('#home')">←</button>
     <h1>管理后台</h1>
   </div>
-  <div class="admin-table" id="admin-table">
-    <!-- JS 渲染 -->
-  </div>
+  <div class="admin-table" id="admin-table"></div>
 </div>
 
-<!-- ============================================
-     PAGE: Account
-     ============================================ -->
+<!-- ========== PAGE: Account ========== -->
 <div id="page-account" class="page">
   <div class="header">
     <button class="back" onclick="navigate('#home')">←</button>
@@ -743,6 +540,10 @@ body {
   </div>
   <div style="padding:20px;">
     <div class="card" style="margin-bottom:16px;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div id="acct-avatar-display" style="width:64px;height:64px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:600;color:var(--primary);margin:0 auto 8px;cursor:pointer;" onclick="showAvatarPicker()">G</div>
+        <div style="font-size:12px;color:var(--primary);cursor:pointer;" onclick="showAvatarPicker()">点击更换头像</div>
+      </div>
       <div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;">个人信息</div>
       <div class="label" style="margin-top:0;">用户名</div>
       <input class="input" id="acct-username" style="margin-bottom:12px;">
@@ -757,9 +558,7 @@ body {
   </div>
 </div>
 
-<!-- ============================================
-     Bottom Nav
-     ============================================ -->
+<!-- ========== Bottom Nav ========== -->
 <div class="bottom-nav" id="bottom-nav">
   <button class="active" onclick="navigate('#home')"><span class="icon">🏠</span>主页</button>
   <button class="nav-fab" id="nav-fab-btn">＋</button>
@@ -768,13 +567,43 @@ body {
 
 <script>
 // ============================================
-// 数据层 (Mock)
+// 本地持久化 (localStorage)
+// ============================================
+const STORAGE_KEY = 'aa_app_data';
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      DB.users = saved.users || DB.users;
+      DB.projects = saved.projects || DB.projects;
+      if (saved.currentUserId) {
+        const found = DB.users.find(u => u.id === saved.currentUserId);
+        if (found) DB.currentUser = found;
+      }
+    }
+  } catch(e) { console.warn('loadDB error:', e); }
+}
+
+function saveDB() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      users: DB.users,
+      projects: DB.projects,
+      currentUserId: DB.currentUser ? DB.currentUser.id : null
+    }));
+  } catch(e) { console.warn('saveDB error:', e); }
+}
+
+// ============================================
+// 数据层
 // ============================================
 const DB = {
   currentUser: null,
   users: [
-    { id: 'u1', username: 'GG', email: 'gg@test.com', password: '123', role: 'admin', zelle: 'gg@bank.com' },
-    { id: 'u2', username: '小王', email: 'xw@test.com', password: '123', role: 'user', zelle: 'xw@pay.com' },
+    { id: 'u1', username: 'GG', email: 'gg@test.com', password: '123', role: 'admin', zelle: 'gg@bank.com', avatar: 'G', avatarBg: '#e0f7fa' },
+    { id: 'u2', username: '小王', email: 'xw@test.com', password: '123', role: 'user', zelle: 'xw@pay.com', avatar: '小', avatarBg: '#fff2e0' },
   ],
   projects: [
     {
@@ -782,8 +611,8 @@ const DB = {
       createdBy: 'u1', settled: false,
       members: ['u1', 'u2'],
       bills: [
-        { id: 'b1', amount: 300, tag: '餐饮', payer: 'u1', split: ['u1','u2'], note: '火锅', paymethod: '', createdAt: '2026-05-18 20:30' },
-        { id: 'b2', amount: 120, tag: '交通', payer: 'u2', split: ['u1','u2'], note: '打车去营地', paymethod: '', createdAt: '2026-05-18 20:35' },
+        { id: 'b1', amount: 300, tag: '餐饮', payer: 'u1', payers: ['u1'], split: ['u1','u2'], note: '火锅', createdAt: '2026-05-18 20:30' },
+        { id: 'b2', amount: 120, tag: '交通', payer: 'u2', payers: ['u2'], split: ['u1','u2'], note: '打车去营地', createdAt: '2026-05-18 20:35' },
       ],
       logs: [
         { time: '05-18 20:30', text: 'GG 创建了项目' },
@@ -793,6 +622,26 @@ const DB = {
     }
   ]
 };
+
+// 头像列表
+const AVATAR_OPTIONS = [
+  { char: 'G', bg: '#e0f7fa', color: '#00b4d8' },
+  { char: '小', bg: '#fff2e0', color: '#e68a00' },
+  { char: '李', bg: '#fce4ec', color: '#c62828' },
+  { char: '王', bg: '#e8f5e9', color: '#2e7d32' },
+  { char: '张', bg: '#f3e5f5', color: '#7b1fa2' },
+  { char: '刘', bg: '#e0f0ff', color: '#007aff' },
+  { char: '陈', bg: '#fff8e1', color: '#f9a825' },
+  { char: '杨', bg: '#f1f8e9', color: '#689f38' },
+  { char: '赵', bg: '#fbe9e7', color: '#d84315' },
+  { char: '黄', bg: '#e4f1fe', color: '#1565c0' },
+  { char: '周', bg: '#fce4ec', color: '#e91e63' },
+  { char: '吴', bg: '#e8f5e9', color: '#388e3c' },
+  { char: '🐱', bg: '#f3e5f5', color: '#9c27b0' },
+  { char: '🐶', bg: '#fff3e0', color: '#ff6f00' },
+  { char: '🐰', bg: '#fce4ec', color: '#d81b60' },
+  { char: '🦊', bg: '#fff8e1', color: '#f57f17' },
+];
 
 // ============================================
 // Router
@@ -804,38 +653,42 @@ function navigate(hash) {
 
 window.addEventListener('hashchange', renderRoute);
 window.addEventListener('load', () => {
-  if (!window.location.hash) window.location.hash = '#login';
+  loadDB();
+  if (!window.location.hash || window.location.hash === '#') window.location.hash = '#login';
   renderRoute();
 });
 
 function renderRoute() {
   const hash = window.location.hash || '#login';
 
-  // 检查登录
   if (!DB.currentUser && !hash.startsWith('#login') && !hash.startsWith('#forgot') && !hash.startsWith('#register')) {
     navigate('#login');
     return;
   }
 
-  // 隐藏所有页面
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
-  // 隐藏/显示 bottom nav
   const nav = document.getElementById('bottom-nav');
-  const showNav = ['#home', '#room', '#settle', '#admin', '#bill', '#logs'].some(h => hash.startsWith(h));
-  nav.style.display = (DB.currentUser && showNav) ? 'flex' : 'none';
+  const showNavPages = ['#home', '#room', '#settle', '#admin', '#bill', '#logs'];
+  const shouldShowNav = DB.currentUser && showNavPages.some(h => hash.startsWith(h));
+  nav.style.display = shouldShowNav ? 'flex' : 'none';
 
-  // 底部 + 号功能
+  // 底部 + 号: 在记账页面隐藏
   const fabBtn = document.getElementById('nav-fab-btn');
   if (fabBtn) {
-    if (hash.startsWith('#room/')) {
-      fabBtn.onclick = navigateToAddBill;
+    if (hash.includes('/add') || hash.includes('/detail/')) {
+      fabBtn.classList.add('hidden');
     } else {
-      fabBtn.onclick = () => navigate('#project/new');
+      fabBtn.classList.remove('hidden');
+      if (hash.startsWith('#room/')) {
+        fabBtn.onclick = navigateToAddBill;
+      } else if (hash.startsWith('#settle/')) {
+        fabBtn.onclick = navigateToAddBill;
+      } else {
+        fabBtn.onclick = () => navigate('#project/new');
+      }
     }
   }
-
-  const mainHash = hash.split('?')[0].split('/')[0];
 
   if (hash.startsWith('#login') || hash.startsWith('#register') || hash.startsWith('#forgot')) {
     document.getElementById('page-login').classList.add('active');
@@ -843,60 +696,25 @@ function renderRoute() {
     else if (hash === '#forgot') showForgot();
     else showLogin();
   }
-  else if (hash === '#home') {
-    document.getElementById('page-home').classList.add('active');
-    renderHome();
-  }
-  else if (hash === '#project/new') {
-    document.getElementById('page-project-new').classList.add('active');
-    document.getElementById('new-date').value = new Date().toISOString().slice(0,7);
-  }
-  else if (hash.startsWith('#room/')) {
-    document.getElementById('page-room').classList.add('active');
-    renderRoom();
-  }
-  else if (hash.startsWith('#bill/') && hash.includes('/add')) {
-    document.getElementById('page-add-bill').classList.add('active');
-    initAddBill();
-  }
-  else if (hash.startsWith('#bill/') && hash.includes('/detail/')) {
-    document.getElementById('page-bill-detail').classList.add('active');
-    renderBillDetail();
-  }
-  else if (hash.startsWith('#settle')) {
-    document.getElementById('page-settle').classList.add('active');
-    renderSettle();
-  }
-  else if (hash === '#logs') {
-    document.getElementById('page-logs').classList.add('active');
-    const pid = getCurrentProjectId();
-    renderLogs(pid);
-  }
-  else if (hash === '#admin') {
-    document.getElementById('page-admin').classList.add('active');
-    renderAdmin();
-  }
-  else if (hash === '#account') {
-    document.getElementById('page-account').classList.add('active');
-    renderAccount();
-  }
+  else if (hash === '#home') { document.getElementById('page-home').classList.add('active'); renderHome(); }
+  else if (hash === '#project/new') { document.getElementById('page-project-new').classList.add('active'); document.getElementById('new-date').value = new Date().toISOString().slice(0,7); }
+  else if (hash.startsWith('#room/')) { document.getElementById('page-room').classList.add('active'); renderRoom(); }
+  else if (hash.startsWith('#bill/') && hash.includes('/add')) { document.getElementById('page-add-bill').classList.add('active'); initAddBill(); }
+  else if (hash.startsWith('#bill/') && hash.includes('/detail/')) { document.getElementById('page-bill-detail').classList.add('active'); renderBillDetail(); }
+  else if (hash.startsWith('#settle')) { document.getElementById('page-settle').classList.add('active'); renderSettle(); }
+  else if (hash === '#logs') { document.getElementById('page-logs').classList.add('active'); renderLogs(getCurrentProjectId()); }
+  else if (hash === '#admin') { document.getElementById('page-admin').classList.add('active'); renderAdmin(); }
+  else if (hash === '#account') { document.getElementById('page-account').classList.add('active'); renderAccount(); }
 }
 
 function getCurrentProjectId() {
   const hash = window.location.hash;
-  const m = hash.match(/room\/([^\/]+)/);
+  const m = hash.match(/room\/([^/]+)/) || hash.match(/bill\/([^/]+)/) || hash.match(/settle\/([^/]+)/);
   return m ? m[1] : null;
 }
-
-function findProject(id) {
-  return DB.projects.find(p => p.id === id);
-}
-function findUser(id) {
-  return DB.users.find(u => u.id === id);
-}
-function findUserByName(name) {
-  return DB.users.find(u => u.username === name);
-}
+function findProject(id) { return DB.projects.find(p => p.id === id); }
+function findUser(id) { return DB.users.find(u => u.id === id); }
+function findUserByName(name) { return DB.users.find(u => u.username === name); }
 
 // ============================================
 // 登录 / 注册
@@ -907,14 +725,12 @@ function showLogin() {
   document.getElementById('forgot-form').style.display = 'none';
   document.querySelector('#page-login h2').textContent = 'AA记账';
 }
-
 function showRegister() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = '';
   document.getElementById('forgot-form').style.display = 'none';
   document.querySelector('#page-login h2').textContent = '注册';
 }
-
 function showForgot() {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = 'none';
@@ -928,6 +744,7 @@ function handleLogin() {
   const found = DB.users.find(u => u.username === user && u.password === pass);
   if (found) {
     DB.currentUser = found;
+    saveDB();
     showToast('登录成功');
     navigate('#home');
   } else {
@@ -943,14 +760,9 @@ function handleRegister() {
   if (!user) return showToast('请输入用户名');
   if (pass !== pass2) return showToast('两次密码不一致');
   if (DB.users.find(u => u.username === user)) return showToast('用户名已存在');
-  const newUser = {
-    id: 'u' + Date.now(),
-    username: user,
-    email: email,
-    password: pass,
-    role: 'user'
-  };
+  const newUser = { id: 'u' + Date.now(), username: user, email, password: pass, role: 'user', zelle: '', avatar: user.charAt(0), avatarBg: '#e0f7fa' };
   DB.users.push(newUser);
+  saveDB();
   showToast('注册成功，请登录');
   showLogin();
 }
@@ -958,15 +770,13 @@ function handleRegister() {
 function handleForgot() {
   const email = document.getElementById('forgot-email').value.trim();
   const found = DB.users.find(u => u.email === email);
-  if (found) {
-    showToast('重置链接已发送到你的邮箱（演示模式）');
-  } else {
-    showToast('未找到该邮箱');
-  }
+  if (found) showToast('重置链接已发送到你的邮箱（演示模式）');
+  else showToast('未找到该邮箱');
 }
 
 function logout() {
   DB.currentUser = null;
+  saveDB();
   navigate('#login');
 }
 
@@ -975,11 +785,12 @@ function logout() {
 // ============================================
 function renderHome() {
   const list = document.getElementById('project-list');
-  // 更新问候语
   const user = DB.currentUser;
   if (user) {
     document.getElementById('home-greeting').textContent = user.username + '，你有 ' + DB.projects.filter(p => p.members.includes(user.id)).length + ' 个项目';
-    document.getElementById('home-avatar').textContent = user.username.charAt(0).toUpperCase();
+    const avatarChar = user.avatar || user.username.charAt(0);
+    document.getElementById('home-avatar').textContent = avatarChar;
+    document.getElementById('home-avatar').style.background = user.avatarBg || 'var(--primary-light)';
   }
   const myProjects = DB.projects.filter(p => p.members.includes(DB.currentUser.id));
   if (myProjects.length === 0) {
@@ -990,10 +801,7 @@ function renderHome() {
     const total = p.bills.reduce((s, b) => s + b.amount, 0);
     return `<div class="project-item" onclick="navigate('#room/${p.id}')">
       <div class="emoji">🏕️</div>
-      <div class="info">
-        <h3>${p.name}</h3>
-        <p>${p.members.length}人 · ${p.bills.length}笔</p>
-      </div>
+      <div class="info"><h3>${p.name}</h3><p>${p.members.length}人 · ${p.bills.length}笔</p></div>
       <div class="amount">¥${total}</div>
     </div>`;
   }).join('');
@@ -1006,6 +814,7 @@ function handleJoin() {
   if (p.members.includes(DB.currentUser.id)) return showToast('你已在项目中');
   p.members.push(DB.currentUser.id);
   p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 通过链接加入了项目' });
+  saveDB();
   showToast('已加入项目');
   navigate('#room/' + p.id);
 }
@@ -1015,16 +824,9 @@ function handleCreateProject() {
   const date = document.getElementById('new-date').value;
   if (!name) return showToast('请输入项目名称');
   const code = Math.random().toString(36).substring(2, 6).toLowerCase();
-  const p = {
-    id: 'p' + Date.now(),
-    name, date, code,
-    createdBy: DB.currentUser.id,
-    settled: false,
-    members: [DB.currentUser.id],
-    bills: [],
-    logs: [{ time: formatTime(new Date()), text: DB.currentUser.username + ' 创建了项目「' + name + '」' }]
-  };
+  const p = { id: 'p' + Date.now(), name, date, code, createdBy: DB.currentUser.id, settled: false, members: [DB.currentUser.id], bills: [], logs: [{ time: formatTime(new Date()), text: DB.currentUser.username + ' 创建了项目「' + name + '」' }] };
   DB.projects.push(p);
+  saveDB();
   showToast('项目已创建，分享码：' + code);
   navigate('#room/' + p.id);
 }
@@ -1032,6 +834,9 @@ function handleCreateProject() {
 // ============================================
 // Room
 // ============================================
+var catEmojis = { '餐饮':'🍜', '交通':'🚗', '住宿':'🏨', '门票':'🎫', '购物':'🛍️', '其他':'📦' };
+var catIconCls = { '餐饮':'food', '交通':'transport', '住宿':'hotel', '门票':'ticket', '购物':'shopping', '其他':'other' };
+
 function renderRoom() {
   const pid = getCurrentProjectId();
   const p = findProject(pid);
@@ -1043,33 +848,27 @@ function renderRoom() {
   document.getElementById('room-total').textContent = '¥' + total;
   document.getElementById('room-perperson').textContent = '人均 ¥' + perPerson.toFixed(1);
 
-  // 成员 - 可点击查看信息
+  // 成员头像（可点击）
   document.getElementById('room-members').innerHTML = p.members.map(id => {
     const u = findUser(id);
-    const initial = u ? u.username.charAt(0) : '?';
-    return `<span class="avatar" onclick="showMemberInfo('${id}')">${initial}</span>`;
+    const char = u ? (u.avatar || u.username.charAt(0)) : '?';
+    return `<span class="avatar" onclick="showMemberInfo('${id}')" style="background:${u && u.avatarBg ? u.avatarBg : 'rgba(255,255,255,.25)'};">${char}</span>`;
   }).join('');
 
-  // 分类汇总（放在蓝色卡片内）
+  // 分类汇总
   const cats = {};
-  p.bills.forEach(b => {
-    cats[b.tag] = (cats[b.tag] || 0) + b.amount;
-  });
-  const catEmojis = { '餐饮':'🍜', '交通':'🚗', '住宿':'🏨', '门票':'🎫', '购物':'🛍️', '其他':'📦' };
-  const catSummary = document.getElementById('room-category-summary');
+  p.bills.forEach(b => { cats[b.tag] = (cats[b.tag] || 0) + b.amount; });
+  const catSum = document.getElementById('room-category-summary');
   if (Object.keys(cats).length > 0) {
-    catSummary.innerHTML = Object.entries(cats).map(([tag, amt]) =>
+    catSum.innerHTML = Object.entries(cats).map(([tag, amt]) =>
       `<span class="badge" style="background:rgba(255,255,255,.15);color:#fff;">${catEmojis[tag]||'📦'} ${tag} ¥${amt}</span>`
     ).join('');
-    if (p.settled) {
-      catSummary.innerHTML += '<span class="badge" style="background:#e8f8e8;color:#34c759;margin-left:6px;">✅ 已结算</span>';
-    }
+    if (p.settled) catSum.innerHTML += '<span class="badge" style="background:#e8f8e8;color:#34c759;margin-left:6px;">✅ 已结算</span>';
   } else {
-    catSummary.innerHTML = '';
+    catSum.innerHTML = '';
   }
 
   // 账单列表 - 分"我付的" / "别人帮我付"
-  const catIconCls = { '餐饮':'food', '交通':'transport', '住宿':'hotel', '门票':'ticket', '购物':'shopping', '其他':'other' };
   const list = document.getElementById('bill-list');
   if (p.bills.length === 0) {
     list.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:60px 0;">还没有账单<br><span style="font-size:32px;display:block;margin-bottom:12px;">📋</span>点击下方 ＋ 记一笔</p>';
@@ -1077,34 +876,28 @@ function renderRoom() {
   }
 
   const myId = DB.currentUser.id;
-  const myPaid = p.bills.filter(b => b.payer === myId);
-  const othersPaid = p.bills.filter(b => b.payer !== myId);
+  const myPaid = p.bills.filter(b => (b.payers || [b.payer]).includes(myId));
+  const othersPaid = p.bills.filter(b => !(b.payers || [b.payer]).includes(myId));
 
   function renderBillItem(b) {
-    const payer = findUser(b.payer);
+    const payers = b.payers || [b.payer];
+    const payerNames = payers.map(id => { const u = findUser(id); return u ? u.username.charAt(0) : '?'; }).join('+');
     const iconCls = catIconCls[b.tag] || 'other';
     return `<div class="bill-item" onclick="navigate('#room/${pid}/detail/${b.id}')">
       <div class="type-icon ${iconCls}">${catEmojis[b.tag]||'📦'}</div>
       <div class="info">
-        <div class="top">
-          <span class="name">${b.note || b.tag}</span>
-          <span class="cost">¥${b.amount}</span>
-        </div>
-        <div class="meta">${payer ? payer.username : '?'} 付款 · ${b.split.length}人分摊</div>
+        <div class="top"><span class="name">${b.note || b.tag}</span><span class="cost">¥${b.amount}</span></div>
+        <div class="meta">${payerNames} 付 · ${b.split.length}人分摊</div>
       </div>
     </div>`;
   }
 
   let html = '';
   if (myPaid.length > 0) {
-    html += '<div class="bill-section"><div class="bill-section-title">我付的</div>';
-    html += myPaid.map(renderBillItem).join('');
-    html += '</div>';
+    html += '<div class="bill-section"><div class="bill-section-title">我付的</div>' + myPaid.map(renderBillItem).join('') + '</div>';
   }
   if (othersPaid.length > 0) {
-    html += '<div class="bill-section"><div class="bill-section-title">别人帮我付</div>';
-    html += othersPaid.map(renderBillItem).join('');
-    html += '</div>';
+    html += '<div class="bill-section"><div class="bill-section-title">别人帮我付</div>' + othersPaid.map(renderBillItem).join('') + '</div>';
   }
   list.innerHTML = html;
 }
@@ -1113,12 +906,11 @@ function shareRoom() {
   const pid = getCurrentProjectId();
   const p = findProject(pid);
   if (!p) return;
-  // 模拟复制分享链接
-  const link = `https://aa-app.workers.dev/join?code=${p.code}`;
+  const link = 'https://aa-app.workers.dev/join?code=' + p.code;
   navigator.clipboard.writeText(link).then(() => {
     showToast('分享链接已复制：' + p.code);
   }).catch(() => {
-    showToast('分享码：' + p.code + '（链接：' + link + '）');
+    showToast('分享码：' + p.code);
   });
 }
 
@@ -1130,13 +922,14 @@ function showMemberInfo(userId) {
   if (!u) return;
   const overlay = document.getElementById('modal-overlay');
   const content = document.getElementById('modal-content');
+  const char = u.avatar || u.username.charAt(0);
   content.innerHTML = `
     <h3>👤 成员信息</h3>
     <div style="text-align:center;padding:12px 0;">
-      <div style="width:56px;height:56px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:var(--primary);margin:0 auto 8px;">${u.username.charAt(0)}</div>
+      <div style="width:56px;height:56px;border-radius:50%;background:${u.avatarBg || 'var(--primary-light)'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:${u.avatarBg ? '#333' : 'var(--primary)'};margin:0 auto 8px;">${char}</div>
       <div style="font-size:18px;font-weight:600;">${u.username}</div>
       <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">${u.email || '未设置邮箱'}</div>
-      ${u.zelle ? '<div style="margin-top:10px;padding:8px 12px;background:#f0f8ff;border-radius:8px;font-size:13px;">💳 Zelle: ' + u.zelle + '</div>' : ''}
+      ${u.zelle ? '<div style="margin-top:10px;padding:8px 12px;background:#f0f8ff;border-radius:8px;font-size:13px;color:#333;">💳 Zelle: ' + u.zelle + '</div>' : ''}
     </div>
     <button class="btn btn-outline" onclick="document.getElementById('modal-overlay').classList.remove('show')" style="margin-top:8px;">关闭</button>
   `;
@@ -1144,18 +937,108 @@ function showMemberInfo(userId) {
 }
 
 // ============================================
+// 数字键盘
+// ============================================
+function createNumpad() {
+  // 移除旧键盘
+  const oldPad = document.getElementById('numpad');
+  if (oldPad) oldPad.remove();
+
+  const pad = document.createElement('div');
+  pad.id = 'numpad';
+  pad.className = 'numpad';
+  pad.innerHTML = `
+    <button class="numpad-key" onclick="numpadInput('1')">1</button>
+    <button class="numpad-key" onclick="numpadInput('2')">2</button>
+    <button class="numpad-key" onclick="numpadInput('3')">3</button>
+    <button class="numpad-key fn" onclick="numpadDelete()">⌫</button>
+    <button class="numpad-key" onclick="numpadInput('4')">4</button>
+    <button class="numpad-key" onclick="numpadInput('5')">5</button>
+    <button class="numpad-key" onclick="numpadInput('6')">6</button>
+    <button class="numpad-key fn" onclick="numpadClear()">C</button>
+    <button class="numpad-key" onclick="numpadInput('7')">7</button>
+    <button class="numpad-key" onclick="numpadInput('8')">8</button>
+    <button class="numpad-key" onclick="numpadInput('9')">9</button>
+    <button class="numpad-key confirm" onclick="numpadConfirm()">确定</button>
+    <button class="numpad-key dot" onclick="numpadInput('.')">.</button>
+    <button class="numpad-key" onclick="numpadInput('0')">0</button>
+    <button class="numpad-key" onclick="numpadInput('00')">00</button>
+    <button class="numpad-key fn" onclick="numpadHide()">收起</button>
+  `;
+  document.body.appendChild(pad);
+  return pad;
+}
+
+var numpadValue = '';
+
+function numpadInput(d) {
+  const display = document.getElementById('bill-amount-display-main');
+  const isStep2 = document.getElementById('bill-step-amount').style.display === 'none';
+  if (isStep2) return;
+  
+  if (d === '.' && numpadValue.includes('.')) return;
+  if (d === '00' && (numpadValue === '' || numpadValue === '0')) { numpadValue = '0'; }
+  else if (numpadValue === '0' && d !== '.') { numpadValue = d; }
+  else { numpadValue += d; }
+  
+  // 限制小数点后2位
+  const parts = numpadValue.split('.');
+  if (parts.length > 1 && parts[1].length > 2) { numpadValue = parts[0] + '.' + parts[1].slice(0,2); }
+  
+  display.textContent = numpadValue || '0';
+}
+
+function numpadDelete() {
+  if (document.getElementById('bill-step-amount').style.display === 'none') return;
+  numpadValue = numpadValue.slice(0, -1);
+  document.getElementById('bill-amount-display-main').textContent = numpadValue || '0';
+}
+
+function numpadClear() {
+  if (document.getElementById('bill-step-amount').style.display === 'none') return;
+  numpadValue = '';
+  document.getElementById('bill-amount-display-main').textContent = '0';
+}
+
+function numpadConfirm() {
+  if (document.getElementById('bill-step-amount').style.display === 'none') return;
+  const amount = parseFloat(numpadValue);
+  if (!amount || amount <= 0) return showToast('请输入有效金额');
+  billDraft.amount = amount;
+  document.getElementById('bill-step-amount').style.display = 'none';
+  document.getElementById('bill-step-detail').style.display = '';
+  document.getElementById('bill-amount-display').textContent = amount;
+  // 收起键盘
+  const pad = document.getElementById('numpad');
+  if (pad) pad.style.display = 'none';
+}
+
+function numpadHide() {
+  const pad = document.getElementById('numpad');
+  if (pad) pad.style.display = 'none';
+}
+
+function showNumpad() {
+  let pad = document.getElementById('numpad');
+  if (!pad) pad = createNumpad();
+  pad.style.display = 'grid';
+  numpadValue = '';
+  document.getElementById('bill-amount-display-main').textContent = '0';
+}
+
+// ============================================
 // Add Bill
 // ============================================
-let billDraft = {};
+var billDraft = {};
 
 function navigateToAddBill() {
   const pid = getCurrentProjectId();
-  navigate(`#bill/${pid}/add`);
+  navigate('#bill/' + pid + '/add');
 }
 
 function navigateToRoom() {
   const pid = getCurrentProjectId();
-  navigate(`#room/${pid}`);
+  navigate('#room/' + pid);
 }
 
 function initAddBill() {
@@ -1167,41 +1050,41 @@ function initAddBill() {
   // 重置步骤
   document.getElementById('bill-step-amount').style.display = '';
   document.getElementById('bill-step-detail').style.display = 'none';
-  document.getElementById('bill-amount').value = '';
+  document.getElementById('bill-amount-display-main').textContent = '0';
+  numpadValue = '';
 
-  // 支付人 - 默认自己头像 + 加号
-  const payerRow = document.getElementById('bill-payer-row');
-  renderPayerRow(payerRow, p, [DB.currentUser.id]);
+  // 支付人
+  renderPayerRow(document.getElementById('bill-payer-row'), p, [DB.currentUser.id]);
 
-  // 分摊人 - 默认全体成员勾选
+  // 分摊人
   document.getElementById('bill-split-all').checked = true;
   document.getElementById('bill-split-row').style.display = 'none';
-  const splitRow = document.getElementById('bill-split-row');
-  renderSplitRow(splitRow, p, p.members);
+  renderSplitRow(document.getElementById('bill-split-row'), p, p.members);
+
+  // 显示数字键盘
+  showNumpad();
 }
 
 function renderPayerRow(container, p, selectedIds) {
   container.innerHTML = selectedIds.map(id => {
     const u = findUser(id);
-    return `<span class="avatar" onclick="removePayer('${id}')">${u ? u.username.charAt(0) : '?'}</span>`;
+    const char = u ? (u.avatar || u.username.charAt(0)) : '?';
+    return '<span class="avatar" onclick="removePayer(\'' + id + '\')" style="background:' + (u && u.avatarBg ? u.avatarBg : 'var(--primary-light)') + ';">' + char + '</span>';
   }).join('') + '<span class="add-circle" onclick="showPayerPicker()">+</span>';
 }
 
 function renderSplitRow(container, p, selectedIds) {
   container.innerHTML = selectedIds.map(id => {
     const u = findUser(id);
-    return `<span class="avatar" onclick="removeSplitMember('${id}')">${u ? u.username.charAt(0) : '?'}</span>`;
+    const char = u ? (u.avatar || u.username.charAt(0)) : '?';
+    return '<span class="avatar" onclick="removeSplitMember(\'' + id + '\')" style="background:' + (u && u.avatarBg ? u.avatarBg : 'var(--primary-light)') + ';">' + char + '</span>';
   }).join('') + '<span class="add-circle" onclick="showSplitPicker()">+</span>';
 }
 
 function toggleSplitAll() {
   const checked = document.getElementById('bill-split-all').checked;
   document.getElementById('bill-split-row').style.display = checked ? 'none' : 'flex';
-  if (checked) {
-    billDraft.splitAll = true;
-  } else {
-    billDraft.splitAll = false;
-    // 默认全部成员选中
+  if (!checked) {
     const pid = getCurrentProjectId();
     const p = findProject(pid);
     if (p) renderSplitRow(document.getElementById('bill-split-row'), p, p.members);
@@ -1209,45 +1092,41 @@ function toggleSplitAll() {
 }
 
 function removePayer(id) {
-  const pid = getCurrentProjectId();
-  const p = findProject(pid);
+  const p = findProject(getCurrentProjectId());
   if (!p) return;
-  let payers = billDraft.payers || [DB.currentUser.id];
+  var payers = billDraft.payers || [DB.currentUser.id];
   if (payers.length <= 1) return showToast('至少需要一位支付人');
-  payers = payers.filter(pid2 => pid2 !== id);
+  payers = payers.filter(function(pid) { return pid !== id; });
   billDraft.payers = payers;
   renderPayerRow(document.getElementById('bill-payer-row'), p, payers);
 }
 
 function removeSplitMember(id) {
-  const pid = getCurrentProjectId();
-  const p = findProject(pid);
+  const p = findProject(getCurrentProjectId());
   if (!p) return;
-  let split = billDraft.customSplit || [...p.members];
+  var split = billDraft.customSplit || p.members.slice();
   if (split.length <= 1) return showToast('至少需要一位分摊人');
-  split = split.filter(sid => sid !== id);
+  split = split.filter(function(sid) { return sid !== id; });
   billDraft.customSplit = split;
   renderSplitRow(document.getElementById('bill-split-row'), p, split);
 }
 
 function showPayerPicker() {
-  const pid = getCurrentProjectId();
-  const p = findProject(pid);
+  const p = findProject(getCurrentProjectId());
   if (!p) return;
   const currentPayers = billDraft.payers || [DB.currentUser.id];
-  showMemberPicker(p.members.filter(id => !currentPayers.includes(id)), (selected) => {
-    billDraft.payers = [...currentPayers, ...selected];
+  showMemberPicker(p.members.filter(function(id) { return !currentPayers.includes(id); }), function(selected) {
+    billDraft.payers = currentPayers.concat(selected);
     renderPayerRow(document.getElementById('bill-payer-row'), p, billDraft.payers);
   });
 }
 
 function showSplitPicker() {
-  const pid = getCurrentProjectId();
-  const p = findProject(pid);
+  const p = findProject(getCurrentProjectId());
   if (!p) return;
-  const currentSplit = billDraft.customSplit || [...p.members];
-  showMemberPicker(p.members.filter(id => !currentSplit.includes(id)), (selected) => {
-    billDraft.customSplit = [...currentSplit, ...selected];
+  const currentSplit = billDraft.customSplit || p.members.slice();
+  showMemberPicker(p.members.filter(function(id) { return !currentSplit.includes(id); }), function(selected) {
+    billDraft.customSplit = currentSplit.concat(selected);
     renderSplitRow(document.getElementById('bill-split-row'), p, billDraft.customSplit);
   });
 }
@@ -1255,51 +1134,49 @@ function showSplitPicker() {
 function showMemberPicker(availableIds, onDone) {
   const overlay = document.getElementById('modal-overlay');
   const content = document.getElementById('modal-content');
-  const users = availableIds.map(id => findUser(id)).filter(Boolean);
+  const users = availableIds.map(function(id) { return findUser(id); }).filter(Boolean);
   if (users.length === 0) return showToast('没有更多成员可添加');
-  
-  window._pickerSelected = [];
-  content.innerHTML = `
-    <h3>选择成员</h3>
-    ${users.map(u => `
-      <label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;">
-        <input type="checkbox" data-id="${u.id}" style="width:18px;height:18px;accent-color:var(--primary);" onchange="if(this.checked) window._pickerSelected.push('${u.id}'); else window._pickerSelected=window._pickerSelected.filter(i=>i!=='${u.id}')">
-        <span style="width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--primary);">${u.username.charAt(0)}</span>
-        <span style="font-size:15px;">${u.username}</span>
-      </label>
-    `).join('')}
-    <button class="btn btn-primary" style="margin-top:16px;" onclick="confirmMemberPicker()">确定添加</button>
-  `;
+
+  var html = '<h3>选择成员</h3>';
+  users.forEach(function(u) {
+    var char = u.avatar || u.username.charAt(0);
+    html += '<label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="togglePickerCheck(this)">';
+    html += '<input type="checkbox" data-id="' + u.id + '" style="width:18px;height:18px;accent-color:var(--primary);pointer-events:none;">';
+    html += '<span style="width:36px;height:36px;border-radius:50%;background:' + (u.avatarBg || 'var(--primary-light)') + ';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--primary);">' + char + '</span>';
+    html += '<span style="font-size:15px;">' + u.username + '</span></label>';
+  });
+  html += '<button class="btn btn-primary" style="margin-top:16px;" onclick="confirmMemberPicker()">确定添加</button>';
+  content.innerHTML = html;
   window._pickerOnDone = onDone;
   overlay.classList.add('show');
 }
 
+function togglePickerCheck(el) {
+  var cb = el.querySelector('input[type=checkbox]');
+  if (cb) cb.checked = !cb.checked;
+}
+
 function confirmMemberPicker() {
-  const checks = document.querySelectorAll('#modal-content input[type=checkbox]:checked');
-  const selected = Array.from(checks).map(c => c.dataset.id);
+  var checks = document.querySelectorAll('#modal-content input[type=checkbox]:checked');
+  var selected = [];
+  checks.forEach(function(c) { selected.push(c.dataset.id); });
   if (selected.length === 0) return showToast('请选择至少一人');
   if (window._pickerOnDone) window._pickerOnDone(selected);
   document.getElementById('modal-overlay').classList.remove('show');
 }
 
 function billNextStep() {
-  const amount = parseFloat(document.getElementById('bill-amount').value);
-  if (!amount || amount <= 0) return showToast('请输入有效金额');
-  billDraft.amount = amount;
-  document.getElementById('bill-step-amount').style.display = 'none';
-  document.getElementById('bill-step-detail').style.display = '';
-  document.getElementById('bill-amount-display').textContent = amount;
+  // 已被数字键盘取代
 }
 
 function selectTag(el) {
-  document.querySelectorAll('#bill-tags .tag').forEach(t => t.classList.remove('selected'));
+  document.querySelectorAll('#bill-tags .tag').forEach(function(t) { t.classList.remove('selected'); });
   el.classList.add('selected');
 }
 
 function billSaveAndContinue() {
   saveBill();
-  initAddBill(); // 重新初始化
-  document.getElementById('bill-amount').focus();
+  initAddBill();
 }
 
 function billSaveAndBack() {
@@ -1313,28 +1190,29 @@ function saveBill() {
   if (!p) return;
 
   const amount = billDraft.amount;
-  const tag = document.querySelector('#bill-tags .tag.selected')?.dataset?.tag || '其他';
+  const tag = (document.querySelector('#bill-tags .tag.selected') && document.querySelector('#bill-tags .tag.selected').dataset && document.querySelector('#bill-tags .tag.selected').dataset.tag) || '其他';
   const note = document.getElementById('bill-note').value.trim() || tag;
   const payers = billDraft.payers || [DB.currentUser.id];
-  const payer = payers[0]; // 主支付人（兼容旧数据）
-  
-  let split;
+  const payer = payers[0];
+  var split;
   if (document.getElementById('bill-split-all').checked) {
-    split = [...p.members];
+    split = p.members.slice();
   } else {
-    split = billDraft.customSplit || [...p.members];
+    split = billDraft.customSplit || p.members.slice();
   }
 
   if (split.length === 0) return showToast('请选择至少一人分摊');
 
   const bill = {
     id: 'b' + Date.now(),
-    amount, tag, payer, payers, split, note,
+    amount: amount, tag: tag, payer: payer, payers: payers,
+    split: split, note: note,
     createdBy: DB.currentUser.id,
     createdAt: formatTime(new Date())
   };
   p.bills.push(bill);
   p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 添加了账单「' + note + ' ¥' + amount + '」' });
+  saveDB();
   showToast('已保存');
 }
 
@@ -1348,37 +1226,38 @@ function renderBillDetail() {
   const pid = m[1], bid = m[2];
   const p = findProject(pid);
   if (!p) return;
-  const bill = p.bills.find(b => b.id === bid);
+  const bill = p.bills.find(function(b) { return b.id === bid; });
   if (!bill) return;
 
   const payers = bill.payers || [bill.payer];
-  const payerName = payers.map(id => { const u = findUser(id); return u ? u.username : '?'; }).join('、');
   const tagEmoji = { '餐饮':'🍜', '交通':'🚗', '住宿':'🏨', '门票':'🎫', '购物':'🛍️', '其他':'📦' };
-  const isOwner = bill.createdBy === DB.currentUser.id || DB.currentUser.role === 'admin' || p.createdBy === DB.currentUser.id;
+
+  var payerHtml = '<div style="display:flex;gap:6px;margin-top:4px;">';
+  payers.forEach(function(id) {
+    const u = findUser(id);
+    const char = u ? (u.avatar || u.username.charAt(0)) : '?';
+    payerHtml += '<span class="avatar" style="width:28px;height:28px;font-size:11px;background:' + (u && u.avatarBg ? u.avatarBg : 'var(--primary-light)') + ';color:var(--primary);border:1px solid var(--primary);cursor:pointer;" onclick="showMemberInfo(\'' + id + '\')">' + char + '</span>';
+  });
+  payerHtml += '</div>';
+
+  var splitHtml = '<div style="display:flex;gap:6px;margin-top:4px;">';
+  bill.split.forEach(function(id) {
+    const u = findUser(id);
+    const char = u ? (u.avatar || u.username.charAt(0)) : '?';
+    splitHtml += '<span class="avatar" style="width:28px;height:28px;font-size:11px;background:#f0f0f5;color:#666;border:1px solid #ddd;cursor:pointer;" onclick="showMemberInfo(\'' + id + '\')">' + char + '</span>';
+  });
+  splitHtml += '</div>';
 
   document.getElementById('bill-detail-content').innerHTML = `
     <div style="text-align:center;font-size:48px;margin-bottom:4px;">${tagEmoji[bill.tag]||'📦'}</div>
     <div style="text-align:center;font-size:36px;font-weight:800;margin-bottom:24px;">¥${bill.amount}</div>
     <div class="card">
-      <div style="margin-bottom:12px;">
-        <span style="color:var(--text-secondary);font-size:13px;">标签</span><br>
-        <span style="font-weight:500;">${bill.tag}</span>
-      </div>
-      <div style="margin-bottom:12px;">
-        <span style="color:var(--text-secondary);font-size:13px;">支付人</span><br>
-        <div style="display:flex;gap:6px;margin-top:4px;">${payers.map(id => { const u = findUser(id); return `<span class="avatar" style="width:28px;height:28px;font-size:11px;background:var(--primary-light);color:var(--primary);border:1px solid var(--primary);" onclick="showMemberInfo('${id}')">${u ? u.username.charAt(0) : '?'}</span>`; }).join('')}</div>
-      </div>
-      <div style="margin-bottom:12px;">
-        <span style="color:var(--text-secondary);font-size:13px;">分摊给</span><br>
-        <div style="display:flex;gap:6px;margin-top:4px;">${bill.split.map(id => { const u = findUser(id); return `<span class="avatar" style="width:28px;height:28px;font-size:11px;background:#f0f0f5;color:#666;border:1px solid #ddd;" onclick="showMemberInfo('${id}')">${u ? u.username.charAt(0) : '?'}</span>`; }).join('')}</div>
-      </div>
-      <div style="margin-bottom:8px;">
-        <span style="color:var(--text-secondary);font-size:13px;">备注</span><br>
-        <span>${bill.note || '无'}</span>
-      </div>
-      ${bill.createdAt ? `<div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">记录于 ${bill.createdAt}</div>` : ''}
-    </div>
-  `;
+      <div style="margin-bottom:12px;"><span style="color:var(--text-secondary);font-size:13px;">标签</span><br><span style="font-weight:500;">${bill.tag}</span></div>
+      <div style="margin-bottom:12px;"><span style="color:var(--text-secondary);font-size:13px;">支付人</span><br>${payerHtml}</div>
+      <div style="margin-bottom:12px;"><span style="color:var(--text-secondary);font-size:13px;">分摊给</span><br>${splitHtml}</div>
+      <div style="margin-bottom:8px;"><span style="color:var(--text-secondary);font-size:13px;">备注</span><br><span>${bill.note || '无'}</span></div>
+      ${bill.createdAt ? '<div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">记录于 ' + bill.createdAt + '</div>' : ''}
+    </div>`;
 }
 
 function deleteBill() {
@@ -1389,7 +1268,7 @@ function deleteBill() {
   const pid = m[1], bid = m[2];
   const p = findProject(pid);
   if (!p) return;
-  const idx = p.bills.findIndex(b => b.id === bid);
+  const idx = p.bills.findIndex(function(b) { return b.id === bid; });
   if (idx === -1) return;
   const bill = p.bills[idx];
   if (bill.createdBy !== DB.currentUser.id && DB.currentUser.role !== 'admin' && p.createdBy !== DB.currentUser.id) {
@@ -1397,6 +1276,7 @@ function deleteBill() {
   }
   p.bills.splice(idx, 1);
   p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 删除了账单「' + bill.note + '」' });
+  saveDB();
   showToast('已删除');
   navigateToRoom();
 }
@@ -1406,7 +1286,7 @@ function deleteBill() {
 // ============================================
 function navigateToSettle() {
   const pid = getCurrentProjectId();
-  navigate(`#settle/${pid}`);
+  navigate('#settle/' + pid);
 }
 
 function renderSettle() {
@@ -1422,67 +1302,51 @@ function renderSettle() {
     return;
   }
 
-  const total = p.bills.reduce((s, b) => s + b.amount, 0);
+  const total = p.bills.reduce(function(s, b) { return s + b.amount; }, 0);
   const perPerson = total / p.members.length;
   document.getElementById('settle-total').textContent = '¥' + total;
   document.getElementById('settle-perperson').textContent = '人均 ¥' + perPerson.toFixed(1);
   document.getElementById('settle-done-check').checked = p.settled;
 
-  // 每人统计
   const stats = {};
-  p.members.forEach(id => { stats[id] = { paid: 0, share: 0 }; });
-  p.bills.forEach(b => {
+  p.members.forEach(function(id) { stats[id] = { paid: 0, share: 0 }; });
+  p.bills.forEach(function(b) {
     if (stats[b.payer]) stats[b.payer].paid += b.amount;
     const perShare = b.amount / b.split.length;
-    b.split.forEach(id => { if (stats[id]) stats[id].share += perShare; });
+    b.split.forEach(function(id) { if (stats[id]) stats[id].share += perShare; });
   });
 
-  const detailDiv = document.getElementById('settle-detail');
-  detailDiv.innerHTML = p.members.map(id => {
+  document.getElementById('settle-detail').innerHTML = p.members.map(function(id) {
     const u = findUser(id);
     const s = stats[id];
     if (!u || !s) return '';
     const balance = s.paid - s.share;
     const isGet = balance > 0;
-    return `<div class="person-card">
-      <div class="header">
-        <span class="name">${u.username}${id === p.createdBy ? ' 👑' : ''}</span>
-        <span class="status ${isGet ? 'get' : 'pay'}">${isGet ? '💰 应收 ¥' + balance.toFixed(1) : '💸 应付 ¥' + Math.abs(balance).toFixed(1)}</span>
-      </div>
-      <div class="details">
-        付了 ¥${s.paid.toFixed(1)} · 应摊 ¥${s.share.toFixed(1)}
-      </div>
-    </div>`;
+    return '<div class="person-card"><div class="header"><span class="name">' + u.username + (id === p.createdBy ? ' 👑' : '') + '</span><span class="status ' + (isGet ? 'get' : 'pay') + '">' + (isGet ? '💰 应收 ¥' + balance.toFixed(1) : '💸 应付 ¥' + Math.abs(balance).toFixed(1)) + '</span></div><div class="details">付了 ¥' + s.paid.toFixed(1) + ' · 应摊 ¥' + s.share.toFixed(1) + '</div></div>';
   }).join('');
 
-  // 最少转账方案
-  const transfers = calculateTransfers(p.members.map(id => ({
-    id, balance: (stats[id]?.paid || 0) - (stats[id]?.share || 0)
-  })));
+  const transfers = calculateTransfers(p.members.map(function(id) {
+    return { id: id, balance: (stats[id]?.paid || 0) - (stats[id]?.share || 0) };
+  }));
   const transferDiv = document.getElementById('transfer-list');
   if (transfers.length === 0) {
     transferDiv.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px 0;">无需转账，已两清</p>';
   } else {
-    transferDiv.innerHTML = transfers.map(t => {
+    transferDiv.innerHTML = transfers.map(function(t) {
       const from = findUser(t.from);
       const to = findUser(t.to);
-      return `<div class="transfer-item">
-        <span class="from">${from ? from.username : '?'}</span>
-        <span class="arrow">→</span>
-        <span class="to">${to ? to.username : '?'}</span>
-        <span class="amount">¥${t.amount.toFixed(1)}</span>
-      </div>`;
+      return '<div class="transfer-item"><span class="from">' + (from ? from.username : '?') + '</span><span class="arrow">→</span><span class="to">' + (to ? to.username : '?') + '</span><span class="amount">¥' + t.amount.toFixed(1) + '</span></div>';
     }).join('');
   }
 }
 
 function calculateTransfers(balances) {
-  const pos = balances.filter(b => b.balance > 0).sort((a, b) => b.balance - a.balance);
-  const neg = balances.filter(b => b.balance < 0).sort((a, b) => a.balance - b.balance);
-  const transfers = [];
-  let i = 0, j = 0;
+  var pos = balances.filter(function(b) { return b.balance > 0; }).sort(function(a, b) { return b.balance - a.balance; });
+  var neg = balances.filter(function(b) { return b.balance < 0; }).sort(function(a, b) { return a.balance - b.balance; });
+  var transfers = [];
+  var i = 0, j = 0;
   while (i < pos.length && j < neg.length) {
-    const amount = Math.min(pos[i].balance, -neg[j].balance);
+    var amount = Math.min(pos[i].balance, -neg[j].balance);
     if (amount > 0.01) {
       transfers.push({ from: neg[j].id, to: pos[i].id, amount: Math.round(amount * 100) / 100 });
     }
@@ -1500,6 +1364,7 @@ function toggleSettleDone() {
   if (!p) return;
   p.settled = document.getElementById('settle-done-check').checked;
   p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + (p.settled ? ' 标记了已结算' : ' 取消了结算标记') });
+  saveDB();
   showToast(p.settled ? '已标记结算' : '已取消结算标记');
 }
 
@@ -1507,39 +1372,37 @@ function copySettleText() {
   const pid = getCurrentProjectId();
   const p = findProject(pid);
   if (!p) return;
-  const total = p.bills.reduce((s, b) => s + b.amount, 0);
+  const total = p.bills.reduce(function(s, b) { return s + b.amount; }, 0);
   const perPerson = total / p.members.length;
-
-  let text = `📊 ${p.name} 结算结果\n`;
-  text += `总支出：¥${total} | 人均：¥${perPerson.toFixed(1)}\n\n`;
+  var text = '📊 ' + p.name + ' 结算结果\n总支出：¥' + total + ' | 人均：¥' + perPerson.toFixed(1) + '\n\n';
 
   const stats = {};
-  p.members.forEach(id => { stats[id] = { paid: 0, share: 0 }; });
-  p.bills.forEach(b => {
+  p.members.forEach(function(id) { stats[id] = { paid: 0, share: 0 }; });
+  p.bills.forEach(function(b) {
     if (stats[b.payer]) stats[b.payer].paid += b.amount;
     const perShare = b.amount / b.split.length;
-    b.split.forEach(id => { if (stats[id]) stats[id].share += perShare; });
+    b.split.forEach(function(id) { if (stats[id]) stats[id].share += perShare; });
   });
 
-  p.members.forEach(id => {
+  p.members.forEach(function(id) {
     const u = findUser(id);
     const s = stats[id];
     if (!u || !s) return;
     const balance = s.paid - s.share;
-    text += `${u.username}：付了¥${s.paid.toFixed(1)}，应摊¥${s.share.toFixed(1)}，${balance >= 0 ? '应收' : '应付'}¥${Math.abs(balance).toFixed(1)}\n`;
+    text += u.username + '：付了¥' + s.paid.toFixed(1) + '，应摊¥' + s.share.toFixed(1) + '，' + (balance >= 0 ? '应收' : '应付') + '¥' + Math.abs(balance).toFixed(1) + '\n';
   });
 
   text += '\n💡 转账方案：\n';
-  const transfers = calculateTransfers(p.members.map(id => ({
-    id, balance: (stats[id]?.paid || 0) - (stats[id]?.share || 0)
-  })));
-  transfers.forEach(t => {
+  const transfers = calculateTransfers(p.members.map(function(id) {
+    return { id: id, balance: (stats[id]?.paid || 0) - (stats[id]?.share || 0) };
+  }));
+  transfers.forEach(function(t) {
     const from = findUser(t.from);
     const to = findUser(t.to);
-    text += `${from ? from.username : '?'} → ${to ? to.username : '?'}：¥${t.amount.toFixed(1)}\n`;
+    text += (from ? from.username : '?') + ' → ' + (to ? to.username : '?') + '：¥' + t.amount.toFixed(1) + '\n';
   });
 
-  navigator.clipboard.writeText(text).then(() => showToast('结算结果已复制')).catch(() => showToast('复制失败'));
+  navigator.clipboard.writeText(text).then(function() { showToast('结算结果已复制'); }).catch(function() { showToast('复制失败'); });
 }
 
 // ============================================
@@ -1548,62 +1411,93 @@ function copySettleText() {
 function renderLogs(pid) {
   const p = findProject(pid);
   if (!p) { document.getElementById('log-list').innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px 0;">请先进入一个项目</p>'; return; }
-  document.getElementById('log-list').innerHTML = p.logs.reverse().map(l =>
-    `<div class="log-item"><span class="time">${l.time}</span><span class="content">${l.text}</span></div>`
-  ).join('');
+  document.getElementById('log-list').innerHTML = p.logs.slice().reverse().map(function(l) {
+    return '<div class="log-item"><span class="time">' + l.time + '</span><span class="content">' + l.text + '</span></div>';
+  }).join('');
 }
 
 // ============================================
 // Admin
 // ============================================
 function renderAdmin() {
-  if (DB.currentUser?.role !== 'admin') {
+  if (!DB.currentUser || DB.currentUser.role !== 'admin') {
     document.getElementById('admin-table').innerHTML = '<p style="text-align:center;color:var(--danger);padding:40px 0;">无权访问</p>';
     return;
   }
-  document.getElementById('admin-table').innerHTML = DB.users.map(u =>
-    `<div class="row">
-      <div>
-        <div class="name">${u.username}${DB.currentUser.id === u.id ? '（你）' : ''}</div>
-        <div class="email">${u.email || '未设邮箱'}</div>
-      </div>
-      <span class="role ${u.role}">${u.role === 'admin' ? '管理员' : '用户'}</span>
-    </div>`
-  ).join('');
+  document.getElementById('admin-table').innerHTML = DB.users.map(function(u) {
+    return '<div class="row"><div><div class="name">' + u.username + (DB.currentUser.id === u.id ? '（你）' : '') + '</div><div class="email">' + (u.email || '未设邮箱') + '</div></div><span class="role ' + u.role + '">' + (u.role === 'admin' ? '管理员' : '用户') + '</span></div>';
+  }).join('');
 }
 
 // ============================================
-// Utils
+// Account & Avatar
 // ============================================
-function handleAccountClick() {
-  navigate('#account');
-}
+function handleAccountClick() { navigate('#account'); }
+
 function renderAccount() {
   const u = DB.currentUser;
   if (!u) return;
   document.getElementById('acct-username').value = u.username || '';
   document.getElementById('acct-zelle').value = u.zelle || '';
+  const char = u.avatar || u.username.charAt(0);
+  var avDisp = document.getElementById('acct-avatar-display');
+  avDisp.textContent = char;
+  avDisp.style.background = u.avatarBg || 'var(--primary-light)';
   const adminSec = document.getElementById('acct-admin-section');
   if (adminSec) adminSec.style.display = (u.role === 'admin') ? '' : 'none';
 }
+
 function saveAccount() {
   const u = DB.currentUser;
   if (!u) return;
   u.username = document.getElementById('acct-username').value.trim() || u.username;
   u.zelle = document.getElementById('acct-zelle').value.trim();
+  if (!u.avatar) u.avatar = u.username.charAt(0);
+  saveDB();
   showToast('已保存');
   navigate('#home');
 }
+
+function showAvatarPicker() {
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  const u = DB.currentUser;
+  if (!u) return;
+  var html = '<h3>选择头像</h3><div class="avatar-grid">';
+  AVATAR_OPTIONS.forEach(function(opt) {
+    var selected = (u.avatar === opt.char && u.avatarBg === opt.bg) ? ' selected' : '';
+    html += '<div class="avatar-option' + selected + '" style="background:' + opt.bg + ';color:' + opt.color + ';" onclick="selectAvatar(\'' + opt.char + '\',\'' + opt.bg + '\',\'' + opt.color + '\')">' + opt.char + '</div>';
+  });
+  html += '</div>';
+  content.innerHTML = html;
+  overlay.classList.add('show');
+}
+
+function selectAvatar(char, bg, color) {
+  const u = DB.currentUser;
+  if (!u) return;
+  u.avatar = char;
+  u.avatarBg = bg;
+  document.getElementById('acct-avatar-display').textContent = char;
+  document.getElementById('acct-avatar-display').style.background = bg;
+  document.getElementById('modal-overlay').classList.remove('show');
+  saveDB();
+  showToast('头像已更换');
+}
+
+// ============================================
+// Utils
+// ============================================
 function formatTime(d) {
-  const pad = n => String(n).padStart(2,'0');
-  return `${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  var pad = function(n) { return String(n).padStart(2,'0'); };
+  return pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 </script>
 </body>

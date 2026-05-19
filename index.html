@@ -1383,11 +1383,22 @@ function toggleBillEdit() {
       '<div class="tag-grid" style="margin-bottom:16px;">' + tagHtml + '</div>' +
       '<div class="label">备注</div>' +
       '<input class="input" id="edit-note" value="' + (bill.note || '') + '" style="margin-bottom:16px;">' +
-      '<div style="display:flex;gap:8px;">' +
+      '<div class="label">支付人</div>' +
+      '<div class="payer-row" id="edit-payer-row"></div>' +
+      '<div class="label" style="margin-top:12px;">分摊给</div>' +
+      '<div class="split-row" id="edit-split-row"></div>' +
+      '<div style="display:flex;gap:8px;margin-top:16px;">' +
       '  <button class="btn btn-primary" onclick="saveBillEdit()">保存修改</button>' +
       '</div>';
     window._editingBillAmount = bill.amount;
     window._editingBillTag = bill.tag;
+    window._editBillDraft = {
+      payers: bill.payers || [bill.payer],
+      split: bill.split.slice()
+    };
+    // 渲染支付人和分摊人
+    editRenderPayerRow(document.getElementById('edit-payer-row'), p, window._editBillDraft.payers);
+    editRenderSplitRow(document.getElementById('edit-split-row'), p, window._editBillDraft.split);
   } else {
     document.getElementById('bill-edit-btn').textContent = '编辑';
     renderBillDetailContent(bill, p);
@@ -1410,6 +1421,91 @@ function showEditNumpad() {
   }
 }
 
+// 编辑模式 - 支付人/分摊人
+function editRenderPayerRow(container, p, selectedIds) {
+  container.innerHTML = selectedIds.map(function(id) {
+    var u = findUser(id);
+    var char = u ? (u.avatar || u.username.charAt(0)) : '?';
+    return '<span class="avatar" onclick="editRemovePayer(\'' + id + '\')" style="background:' + (u && u.avatarBg ? u.avatarBg : 'var(--primary-light)') + ';">' + char + '</span>';
+  }).join('') + '<span class="add-circle" onclick="editShowPayerPicker()">+</span>';
+}
+
+function editRenderSplitRow(container, p, selectedIds) {
+  container.innerHTML = selectedIds.map(function(id) {
+    var u = findUser(id);
+    var char = u ? (u.avatar || u.username.charAt(0)) : '?';
+    return '<span class="avatar" onclick="editRemoveSplitMember(\'' + id + '\')" style="background:' + (u && u.avatarBg ? u.avatarBg : 'var(--primary-light)') + ';">' + char + '</span>';
+  }).join('') + '<span class="add-circle" onclick="editShowSplitPicker()">+</span>';
+}
+
+function editRemovePayer(id) {
+  var p = findProject(getCurrentProjectId());
+  if (!p) return;
+  var payers = window._editBillDraft.payers;
+  if (payers.length <= 1) return showToast('至少需要一位支付人');
+  payers = payers.filter(function(pid) { return pid !== id; });
+  window._editBillDraft.payers = payers;
+  editRenderPayerRow(document.getElementById('edit-payer-row'), p, payers);
+}
+
+function editRemoveSplitMember(id) {
+  var p = findProject(getCurrentProjectId());
+  if (!p) return;
+  var split = window._editBillDraft.split;
+  if (split.length <= 1) return showToast('至少需要一位分摊人');
+  split = split.filter(function(sid) { return sid !== id; });
+  window._editBillDraft.split = split;
+  editRenderSplitRow(document.getElementById('edit-split-row'), p, split);
+}
+
+function editShowPayerPicker() {
+  var p = findProject(getCurrentProjectId());
+  if (!p) return;
+  var currentPayers = window._editBillDraft.payers;
+  showMemberPickerEx(p.members.filter(function(id) { return !currentPayers.includes(id); }), function(selected) {
+    window._editBillDraft.payers = currentPayers.concat(selected);
+    editRenderPayerRow(document.getElementById('edit-payer-row'), p, window._editBillDraft.payers);
+  });
+}
+
+function editShowSplitPicker() {
+  var p = findProject(getCurrentProjectId());
+  if (!p) return;
+  var currentSplit = window._editBillDraft.split;
+  showMemberPickerEx(p.members.filter(function(id) { return !currentSplit.includes(id); }), function(selected) {
+    window._editBillDraft.split = currentSplit.concat(selected);
+    editRenderSplitRow(document.getElementById('edit-split-row'), p, window._editBillDraft.split);
+  });
+}
+
+function showMemberPickerEx(availableIds, onDone) {
+  var overlay = document.getElementById('modal-overlay');
+  var content = document.getElementById('modal-content');
+  var users = availableIds.map(function(id) { return findUser(id); }).filter(Boolean);
+  if (users.length === 0) return showToast('没有更多成员可添加');
+  var html = '<h3>选择成员</h3>';
+  users.forEach(function(u) {
+    var char = u.avatar || u.username.charAt(0);
+    html += '<label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="togglePickerCheck(this)">';
+    html += '<input type="checkbox" data-id="' + u.id + '" style="width:18px;height:18px;accent-color:var(--primary);pointer-events:none;">';
+    html += '<span style="width:36px;height:36px;border-radius:50%;background:' + (u.avatarBg || 'var(--primary-light)') + ';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--primary);">' + char + '</span>';
+    html += '<span style="font-size:15px;">' + u.username + '</span></label>';
+  });
+  html += '<button class="btn btn-primary" style="margin-top:16px;" onclick="confirmMemberPickerEx()">确定添加</button>';
+  content.innerHTML = html;
+  window._pickerOnDone = onDone;
+  overlay.classList.add('show');
+}
+
+function confirmMemberPickerEx() {
+  var checks = document.querySelectorAll('#modal-content input[type=checkbox]:checked');
+  var selected = [];
+  checks.forEach(function(c) { selected.push(c.dataset.id); });
+  if (selected.length === 0) return showToast('请选择至少一人');
+  if (window._pickerOnDone) window._pickerOnDone(selected);
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+
 function saveBillEdit() {
   const hash = window.location.hash;
   const m = hash.match(/bill\/([^/]+)\/detail\/([^/]+)/);
@@ -1423,12 +1519,16 @@ function saveBillEdit() {
   var newAmount = window._editingBillAmount;
   var newTag = window._editingBillTag || bill.tag;
   var newNote = document.getElementById('edit-note').value.trim() || bill.tag;
+  var newPayers = window._editBillDraft ? window._editBillDraft.payers : null;
+  var newSplit = window._editBillDraft ? window._editBillDraft.split : null;
 
   if (!newAmount || newAmount <= 0) return showToast('请输入有效金额');
 
   bill.amount = newAmount;
   bill.tag = newTag;
   bill.note = newNote;
+  if (newPayers) { bill.payers = newPayers; bill.payer = newPayers[0]; }
+  if (newSplit) bill.split = newSplit;
   p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 修改了账单「' + bill.note + ' ¥' + newAmount + '」' });
   saveDB();
   showToast('已保存');

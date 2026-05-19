@@ -447,7 +447,7 @@ body {
     <div style="flex:1;display:flex;align-items:center;gap:6px;">
       <span id="room-emoji" style="font-size:18px;"></span>
       <h1 id="room-title" style="flex:1;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">项目名称</h1>
-      <span id="room-rename-btn" style="font-size:15px;cursor:pointer;padding:2px 4px;" onclick="showRenameModal()">✏️</span>
+      <span id="room-rename-btn" style="font-size:18px;cursor:pointer;padding:2px 4px;" onclick="showRenameModal()">⚙️</span>
     </div>
     <button style="border:none;background:none;font-size:14px;color:var(--primary);font-weight:600;" onclick="shareRoom()">分享</button>
   </div>
@@ -961,15 +961,17 @@ function showRenameModal() {
   const pid = getCurrentProjectId();
   const p = findProject(pid);
   if (!p) return;
+  const isCreator = p.createdBy === DB.currentUser.id;
   const overlay = document.getElementById('modal-overlay');
   const content = document.getElementById('modal-content');
   content.innerHTML = `
-    <h3>✏️ 重命名项目</h3>
+    <h3>⚙️ 项目设置</h3>
     <div class="label" style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">项目名称</div>
     <input class="input" id="rename-input" value="${p.name}" style="margin-bottom:16px;">
     <div class="label" style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">项目图标</div>
     <div class="emoji-grid" id="rename-emoji-grid"></div>
     <button class="btn btn-primary" onclick="saveRename()" style="margin-top:16px;">保存</button>
+    ${isCreator ? '<button class="btn btn-danger" onclick="deleteProject()" style="margin-top:12px;">🗑️ 删除项目</button>' : ''}
   `;
   var re = p.emoji || '🏕️';
   var grid = document.getElementById('rename-emoji-grid');
@@ -999,6 +1001,19 @@ function saveRename() {
   document.getElementById('modal-overlay').classList.remove('show');
   renderRoom();
   showToast('已保存');
+}
+
+function deleteProject() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  if (p.createdBy !== DB.currentUser.id) return showToast('只有创建者可以删除项目');
+  if (!confirm('确认删除项目「' + p.name + '」？所有账单数据将被清除。')) return;
+  DB.projects = DB.projects.filter(function(pr) { return pr.id !== pid; });
+  saveDB();
+  document.getElementById('modal-overlay').classList.remove('show');
+  showToast('项目已删除');
+  navigate('#home');
 }
 
 // ============================================

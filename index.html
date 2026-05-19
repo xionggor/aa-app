@@ -920,7 +920,7 @@ function renderRoom() {
     const payers = b.payers || [b.payer];
     const payerNames = payers.map(id => { const u = findUser(id); return u ? u.username.charAt(0) : '?'; }).join('+');
     const iconCls = catIconCls[b.tag] || 'other';
-    return `<div class="bill-item" onclick="navigate('#room/${pid}/detail/${b.id}')">
+    return `<div class="bill-item" onclick="navigate('#bill/${pid}/detail/${b.id}')">
       <div class="type-icon ${iconCls}">${catEmojis[b.tag]||'📦'}</div>
       <div class="info">
         <div class="top"><span class="name">${b.note || b.tag}</span><span class="cost">¥${b.amount}</span></div>
@@ -1302,7 +1302,7 @@ function saveBill() {
 // ============================================
 function renderBillDetail() {
   const hash = window.location.hash;
-  const m = hash.match(/room\/([^/]+)\/detail\/([^/]+)/);
+  const m = hash.match(/bill\/([^/]+)\/detail\/([^/]+)/);
   if (!m) return;
   const pid = m[1], bid = m[2];
   const p = findProject(pid);
@@ -1344,7 +1344,7 @@ function renderBillDetail() {
 function deleteBill() {
   if (!confirm('确认删除此账单？')) return;
   const hash = window.location.hash;
-  const m = hash.match(/room\/([^/]+)\/detail\/([^/]+)/);
+  const m = hash.match(/bill\/([^/]+)\/detail\/([^/]+)/);
   if (!m) return;
   const pid = m[1], bid = m[2];
   const p = findProject(pid);

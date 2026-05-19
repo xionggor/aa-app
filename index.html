@@ -123,6 +123,7 @@ body {
   width: 140px; height: 140px;
   background: rgba(255,255,255,.08);
   border-radius: 50%;
+  pointer-events: none;
 }
 .room-summary .label-row { display: flex; justify-content: space-between; align-items: center; }
 .room-summary .label-row .label { font-size: 13px; opacity: .85; }
@@ -1317,7 +1318,7 @@ function renderBillDetail() {
   payers.forEach(function(id) {
     const u = findUser(id);
     const char = u ? (u.avatar || u.username.charAt(0)) : '?';
-    payerHtml += '<span class="avatar" style="width:28px;height:28px;font-size:11px;background:' + (u && u.avatarBg ? u.avatarBg : 'var(--primary-light)') + ';color:var(--primary);border:1px solid var(--primary);cursor:pointer;" onclick="showMemberInfo(\'' + id + '\')">' + char + '</span>';
+    payerHtml += '<span class="avatar" style="width:28px;height:28px;font-size:11px;display:flex;align-items:center;justify-content:center;background:' + (u && u.avatarBg ? u.avatarBg : 'var(--primary-light)') + ';color:var(--primary);border:1px solid var(--primary);cursor:pointer;" onclick="showMemberInfo(\'' + id + '\')">' + char + '</span>';
   });
   payerHtml += '</div>';
 
@@ -1325,7 +1326,7 @@ function renderBillDetail() {
   bill.split.forEach(function(id) {
     const u = findUser(id);
     const char = u ? (u.avatar || u.username.charAt(0)) : '?';
-    splitHtml += '<span class="avatar" style="width:28px;height:28px;font-size:11px;background:#f0f0f5;color:#666;border:1px solid #ddd;cursor:pointer;" onclick="showMemberInfo(\'' + id + '\')">' + char + '</span>';
+    splitHtml += '<span class="avatar" style="width:28px;height:28px;font-size:11px;display:flex;align-items:center;justify-content:center;background:#f0f0f5;color:#666;border:1px solid #ddd;cursor:pointer;" onclick="showMemberInfo(\'' + id + '\')">' + char + '</span>';
   });
   splitHtml += '</div>';
 

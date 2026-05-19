@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AA记账 App 结构图</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #020617; color: #e2e8f0;
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  padding: 40px 20px;
+}
+.container { max-width: 1100px; width: 100%; }
+
+/* Header */
+.header {
+  text-align: center; margin-bottom: 32px;
+}
+.header h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; }
+.header .dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #22d3ee; margin-right: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.header .subtitle { font-size: 12px; color: #64748b; margin-top: 6px; }
+
+/* SVG Card */
+.svg-card {
+  background: #0f172a; border: 1px solid #1e293b; border-radius: 16px;
+  padding: 24px; margin-bottom: 24px;
+}
+.svg-card svg { width: 100%; height: auto; display: block; }
+
+/* Info Cards */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.card {
+  background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;
+  padding: 20px;
+}
+.card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.card-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.card-dot.cyan { background: #22d3ee; }
+.card-dot.green { background: #34d399; }
+.card-dot.violet { background: #a78bfa; }
+.card h3 { font-size: 13px; font-weight: 600; color: #f1f5f9; }
+.card ul { list-style: none; }
+.card ul li { font-size: 11px; color: #94a3b8; padding: 4px 0; line-height: 1.6; }
+.card ul li strong { color: #e2e8f0; }
+
+.footer { text-align: center; font-size: 10px; color: #475569; padding: 12px 0 24px; }
+
+@media (max-width: 700px) {
+  .cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1><span class="dot"></span>AA记账 App · 页面结构图</h1>
+    <div class="subtitle"># 手机优先 · 单页应用 · Hash 路由 · Mock 数据</div>
+  </div>
+
+  <div class="svg-card">
+    <svg viewBox="0 0 1040 820" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+      
+      <!-- Grid -->
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+        </pattern>
+        <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#22d3ee"/>
+        </marker>
+        <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#34d399"/>
+        </marker>
+        <marker id="arrow-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#a78bfa"/>
+        </marker>
+        <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#fbbf24"/>
+        </marker>
+        <marker id="arrow-slate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 Z" fill="#94a3b8"/>
+        </marker>
+      </defs>
+      
+      <rect width="1040" height="820" fill="url(#grid)"/>
+
+      <!-- ============ Arrows (drawn first, behind) ============ -->
+
+      <!-- Login → Home -->
+      <path d="M 520 120 L 520 170" stroke="#22d3ee" stroke-width="1.5" fill="none" marker-end="url(#arrow-cyan)"/>
+      <!-- Home → Room -->
+      <path d="M 240 385 L 240 430" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#arrow-green)"/>
+      <!-- Room → Add Bill -->
+      <path d="M 520 385 L 520 480" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#arrow-green)"/>
+      <!-- Room → Settle -->
+      <path d="M 800 385 L 800 430" stroke="#fbbf24" stroke-width="1.5" fill="none" marker-end="url(#arrow-amber)"/>
+      <!-- Account → Admin -->
+      <path d="M 800 580 L 800 630" stroke="#a78bfa" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-violet)"/>
+      
+      <!-- Bottom Nav connections -->
+      <path d="M 240 430 L 520 480" stroke="#64748b" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+      <path d="M 240 430 L 800 430" stroke="#64748b" stroke-width="1" fill="none" stroke-dasharray="3,3"/>
+
+      <!-- ============ Title ============ -->
+      <text x="520" y="40" text-anchor="middle" font-size="13" font-weight="700" fill="#f1f5f9">Hash 路由架构 <tspan fill="#64748b" font-size="9"># → 页面切换</tspan></text>
+
+      <!-- ============ LAYER 1: Login ============ -->
+      <rect x="400" y="60" width="240" height="60" rx="8" fill="#0f172a"/>
+      <rect x="400" y="60" width="240" height="60" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="520" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#22d3ee">#login</text>
+      <text x="520" y="104" text-anchor="middle" font-size="9" fill="#64748b">登录 / 注册</text>
+
+      <!-- ============ LAYER 2: Home + Room Row ============ -->
+      
+      <!-- Home -->
+      <rect x="120" y="215" width="240" height="170" rx="8" fill="#0f172a"/>
+      <rect x="120" y="215" width="240" height="170" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="240" y="243" text-anchor="middle" font-size="12" font-weight="600" fill="#34d399">#home</text>
+      <text x="240" y="260" text-anchor="middle" font-size="9" fill="#94a3b8">主页 · 项目列表</text>
+      
+      <text x="155" y="290" font-size="9" fill="#64748b">• 项目卡片列表</text>
+      <text x="155" y="307" font-size="9" fill="#64748b">• 余额汇总</text>
+      <text x="155" y="324" font-size="9" fill="#64748b">• 点击进入项目</text>
+      
+      <text x="240" y="360" text-anchor="middle" font-size="8" fill="#22d3ee">🏠 主页</text>
+
+      <!-- Room -->
+      <rect x="400" y="215" width="240" height="170" rx="8" fill="#0f172a"/>
+      <rect x="400" y="215" width="240" height="170" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="520" y="243" text-anchor="middle" font-size="12" font-weight="600" fill="#34d399">#room/{id}</text>
+      <text x="520" y="260" text-anchor="middle" font-size="9" fill="#94a3b8">项目详情页</text>
+      
+      <text x="430" y="290" font-size="9" fill="#64748b">• 成员头像（点击查看信息）</text>
+      <text x="430" y="307" font-size="9" fill="#64748b">• 账单列表 · 我的支出</text>
+      <text x="430" y="324" font-size="9" fill="#64748b">• 全员结账</text>
+      <text x="430" y="341" font-size="9" fill="#64748b">• 操作记录</text>
+
+      <!-- Settle -->
+      <rect x="680" y="215" width="240" height="170" rx="8" fill="#0f172a"/>
+      <rect x="680" y="215" width="240" height="170" rx="8" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+      <text x="800" y="243" text-anchor="middle" font-size="12" font-weight="600" fill="#fbbf24">#settle/{id}</text>
+      <text x="800" y="260" text-anchor="middle" font-size="9" fill="#94a3b8">结算页面</text>
+      
+      <text x="710" y="290" font-size="9" fill="#64748b">• 谁欠谁多少钱</text>
+      <text x="710" y="307" font-size="9" fill="#64748b">• 最小转账方案</text>
+      <text x="710" y="324" font-size="9" fill="#64748b">• 确认结清</text>
+
+      <!-- ============ LAYER 3: Bill Form + Account + Admin ============ -->
+      
+      <!-- Add Bill Form -->
+      <rect x="400" y="430" width="240" height="200" rx="8" fill="#0f172a"/>
+      <rect x="400" y="430" width="240" height="200" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="520" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#34d399">#bill/{id}</text>
+      <text x="520" y="475" text-anchor="middle" font-size="9" fill="#94a3b8">记账表单</text>
+      
+      <text x="420" y="500" font-size="8" fill="#64748b">金额</text>
+      <rect x="420" y="505" width="200" height="20" rx="4" fill="rgba(8,51,68,0.3)" stroke="#1e293b" stroke-width="1"/>
+      <text x="430" y="518" font-size="7" fill="#475569">输入金额...</text>
+      
+      <text x="420" y="540" font-size="8" fill="#64748b">标签</text>
+      <rect x="420" y="545" width="70" height="18" rx="4" fill="rgba(8,51,68,0.3)" stroke="#1e293b" stroke-width="1"/>
+      <text x="425" y="557" font-size="7" fill="#475569">餐饮</text>
+      <rect x="495" y="545" width="70" height="18" rx="4" fill="rgba(8,51,68,0.3)" stroke="#1e293b" stroke-width="1"/>
+      <text x="500" y="557" font-size="7" fill="#475569">交通</text>
+
+      <text x="420" y="580" font-size="8" fill="#64748b">支付人 · 分摊给</text>
+      <rect x="420" y="585" width="200" height="24" rx="4" fill="rgba(76,29,149,0.25)" stroke="#a78bfa" stroke-width="0.8"/>
+      <text x="430" y="600" font-size="8" fill="#a78bfa">GG ⟶ 小王 + 小李 +</text>
+
+      <text x="420" y="618" font-size="8" fill="#64748b">备注</text>
+      <rect x="420" y="622" width="200" height="20" rx="4" fill="rgba(8,51,68,0.3)" stroke="#1e293b" stroke-width="1"/>
+      <text x="430" y="635" font-size="7" fill="#475569">可选备注...</text>
+
+      <!-- Account -->
+      <rect x="680" y="430" width="240" height="150" rx="8" fill="#0f172a"/>
+      <rect x="680" y="430" width="240" height="150" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="800" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#a78bfa">#account</text>
+      <text x="800" y="475" text-anchor="middle" font-size="9" fill="#94a3b8">账号设置</text>
+      
+      <text x="710" y="502" font-size="9" fill="#64748b">• 修改用户名</text>
+      <text x="710" y="519" font-size="9" fill="#64748b">• Zelle 账号管理</text>
+      <text x="710" y="536" font-size="9" fill="#64748b">• [管理] 管理后台入口</text>
+      <text x="710" y="553" font-size="9" fill="#64748b">• 退出登录</text>
+
+      <!-- Admin -->
+      <rect x="680" y="580" width="240" height="100" rx="8" fill="#0f172a"/>
+      <rect x="680" y="580" width="240" height="100" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="800" y="608" text-anchor="middle" font-size="12" font-weight="600" fill="#a78bfa">#admin</text>
+      <text x="800" y="625" text-anchor="middle" font-size="9" fill="#94a3b8">管理后台</text>
+      <text x="710" y="650" font-size="9" fill="#64748b">• 用户管理 · 项目审计</text>
+      <text x="710" y="667" font-size="9" fill="#64748b">• 仅管理员可见</text>
+
+      <!-- ============ Bottom Nav ============ -->
+      <rect x="280" y="730" width="480" height="50" rx="25" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+      
+      <!-- Home nav -->
+      <rect x="300" y="738" width="120" height="34" rx="17" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+      <text x="360" y="759" text-anchor="middle" font-size="10" fill="#34d399">🏠 主页</text>
+      
+      <!-- FAB nav -->
+      <circle cx="520" cy="755" r="22" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="2"/>
+      <text x="520" y="760" text-anchor="middle" font-size="16" fill="#22d3ee">＋</text>
+      
+      <!-- Account nav -->
+      <rect x="620" y="738" width="120" height="34" rx="17" fill="rgba(76,29,149,0.3)" stroke="#a78bfa" stroke-width="1"/>
+      <text x="680" y="759" text-anchor="middle" font-size="10" fill="#a78bfa">👤 账号</text>
+
+      <!-- ============ Legend ============ -->
+      <rect x="40" y="755" width="80" height="18" rx="4" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="0.8"/>
+      <text x="80" y="768" text-anchor="middle" font-size="7" fill="#34d399">主要页面</text>
+      <rect x="40" y="777" width="80" height="18" rx="4" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="0.8"/>
+      <text x="80" y="790" text-anchor="middle" font-size="7" fill="#fbbf24">结算</text>
+      
+      <rect x="924" y="755" width="80" height="18" rx="4" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="0.8"/>
+      <text x="964" y="768" text-anchor="middle" font-size="7" fill="#a78bfa">管理 / 账号</text>
+      <rect x="924" y="777" width="80" height="18" rx="4" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="0.8"/>
+      <text x="964" y="790" text-anchor="middle" font-size="7" fill="#22d3ee">登录</text>
+
+    </svg>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-dot cyan"></div>
+        <h3>路由结构</h3>
+      </div>
+      <ul>
+        <li><strong>#login</strong> — 登录 / 注册页</li>
+        <li><strong>#home</strong> — 项目列表主页</li>
+        <li><strong>#room/{id}</strong> — 项目内部（账单、成员）</li>
+        <li><strong>#bill/{id}?room={rid}</strong> — 记账表单</li>
+        <li><strong>#settle/{id}</strong> — 结算清算页</li>
+        <li><strong>#account</strong> — 账号设置</li>
+        <li><strong>#admin</strong> — 管理后台（管理员专用）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-dot green"></div>
+        <h3>项目页面 (#room)</h3>
+      </div>
+      <ul>
+        <li>① 顶部 — 项目名称 + 成员头像</li>
+        <li>② 点击头像 → 查看用户信息（Zelle）</li>
+        <li>③ 账单列表 · 我的支出</li>
+        <li>④ 他人支出（别人代付的部分）</li>
+        <li>⑤ 全员结账按钮</li>
+        <li>⑥ 操作记录 Tab</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-dot violet"></div>
+        <h3>记账表单 (#bill)</h3>
+      </div>
+      <ul>
+        <li><strong>💰 金额</strong> — 数字键盘自动弹出</li>
+        <li><strong>🏷️ 标签</strong> — 餐饮 / 交通 / 购物 等</li>
+        <li><strong>👤 支付人</strong> — 默认自己，可 + 添加</li>
+        <li><strong>👥 分摊给</strong> — 默认全部，可 + 添加</li>
+        <li><strong>💬 备注</strong> — 可选</li>
+        <li><strong>✅ 保存并返回</strong> → 回到项目页</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">AA记账 App · 手机优先 SPA · 文件：index.html</div>
+
+</div>
+</body>
+</html>

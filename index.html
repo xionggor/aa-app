@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AA记账</title>
+<style>
+/* ============================================
+   全局 & 主题
+   ============================================ */
+:root {
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --primary: #00b4d8;
+  --primary-dark: #0096c7;
+  --primary-light: #e0f7fa;
+  --danger: #ff3b30;
+  --success: #34c759;
+  --warning: #ff9500;
+  --text: #1a1a2e;
+  --text-secondary: #8e8e93;
+  --border: #e5e5ea;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 8px rgba(0,0,0,0.06);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 80px;
+  min-height: 100vh;
+}
+
+/* 隐藏所有页面，JS 控制显示 */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ============================================
+   通用组件
+   ============================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 14px 24px; border: none; border-radius: var(--radius);
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  width: 100%; transition: opacity .2s;
+}
+.btn:active { opacity: .7; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-ghost { background: transparent; color: var(--primary); font-weight: 500; }
+
+.input {
+  width: 100%; padding: 14px 16px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 16px; background: #fff; outline: none;
+  transition: border-color .2s;
+}
+.input:focus { border-color: var(--primary); }
+
+.card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+
+.header {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(245,246,248,0.92);
+  backdrop-filter: blur(12px);
+  padding: 14px 16px 10px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.header h1 {
+  font-size: 17px; font-weight: 600; flex: 1;
+  color: var(--text);
+}
+.header .back {
+  font-size: 22px; cursor: pointer; padding: 4px 4px 4px 0;
+  border: none; background: none; color: var(--primary);
+}
+
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+}
+.badge-food { background: #fff2e0; color: #e68a00; }
+.badge-transport { background: #e0f0ff; color: #007aff; }
+.badge-hotel { background: #e8f5e9; color: #2e7d32; }
+.badge-ticket { background: #fce4ec; color: #c62828; }
+.badge-shopping { background: #f3e5f5; color: #7b1fa2; }
+.badge-other { background: #f5f5f5; color: #666; }
+
+.tabs {
+  display: flex; gap: 0; background: var(--card);
+  border-radius: var(--radius); overflow: hidden;
+  margin-bottom: 16px; border: 1px solid var(--border);
+}
+.tab {
+  flex: 1; padding: 12px; text-align: center;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: all .2s; border: none; background: transparent; color: var(--text-secondary);
+}
+.tab.active { background: var(--primary); color: #fff; font-weight: 600; }
+
+/* ============================================
+   Page: Login
+   ============================================ */
+#page-login {
+  padding: 60px 24px 0;
+  min-height: 100vh;
+}
+#page-login .inner {
+  display: flex; flex-direction: column; max-width: 400px; margin: 0 auto;
+}
+#page-login .logo {
+  font-size: 42px; text-align: center; margin-bottom: 8px;
+}
+#page-login h2 {
+  text-align: center; font-size: 28px; margin-bottom: 4px;
+}
+#page-login p.sub {
+  text-align: center; color: var(--text-secondary); margin-bottom: 40px;
+}
+#page-login .input { margin-bottom: 12px; }
+#page-login .btn { margin-bottom: 12px; }
+#page-login .switch-link {
+  text-align: center; font-size: 14px; color: var(--primary);
+  cursor: pointer; margin-top: 8px;
+}
+#page-login .switch-link:active { opacity: .7; }
+
+/* ============================================
+   Page: Home
+   ============================================ */
+#page-home .project-list { padding: 16px 20px; }
+.project-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px; margin-bottom: 10px;
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); cursor: pointer; transition: all .15s;
+}
+.project-item:active { transform: scale(.97); opacity: .8; }
+.project-item .emoji {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--primary-light); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.project-item .info { flex: 1; min-width: 0; }
+.project-item .info h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+.project-item .info p { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+.project-item .amount { font-size: 18px; font-weight: 700; color: var(--primary); }
+
+.join-section {
+  padding: 8px 20px 16px;
+  display: flex; gap: 8px;
+}
+.join-section .input {
+  flex: 1; padding: 12px 14px; font-size: 14px;
+  border-radius: var(--radius); border: 2px solid var(--border);
+}
+.join-section .btn {
+  width: auto; padding: 12px 20px; white-space: nowrap;
+  border-radius: var(--radius); font-size: 14px;
+}
+
+.fab {
+  position: fixed; bottom: 32px; right: 20px;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  font-size: 28px; border: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,122,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 20; transition: transform .2s;
+}
+.fab:active { transform: scale(.9); }
+
+/* ============================================
+   Page: Room
+   ============================================ */
+.room-summary {
+  margin: 12px 16px; border-radius: 16px; padding: 20px;
+  background: linear-gradient(135deg, #00b4d8, #0077b6);
+  color: #fff; position: relative; overflow: hidden;
+}
+.room-summary::after {
+  content: ''; position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  background: rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+.room-summary .label-row {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.room-summary .label-row .label {
+  font-size: 13px; opacity: .85;
+}
+.room-summary .label-row .settle-btn {
+  font-size: 13px; opacity: .9; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.2); padding: 6px 12px;
+  border-radius: 20px; border: none; color: #fff;
+}
+.room-summary .amount-row {
+  display: flex; align-items: baseline; gap: 4px; margin-top: 8px;
+}
+.room-summary .amount-row .currency {
+  font-size: 16px; opacity: .85;
+}
+.room-summary .amount-row .total {
+  font-size: 40px; font-weight: 800; letter-spacing: -1px;
+}
+.room-summary .per-person {
+  font-size: 13px; opacity: .7; margin-top: 4px;
+}
+.room-summary .members {
+  display: flex; gap: -4px; margin-top: 14px;
+}
+.room-summary .members .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; border: 2px solid rgba(255,255,255,.4);
+  margin-right: -6px;
+}
+
+.room-actions {
+  display: flex; gap: 8px; padding: 0 20px 12px;
+}
+.room-actions .btn { flex: 1; font-size: 14px; padding: 12px; }
+
+.category-summary {
+  padding: 0 20px 12px;
+}
+
+.bill-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; margin-bottom: 8px;
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); cursor: pointer; transition: transform .1s;
+}
+.bill-item:active { transform: scale(.98); }
+.bill-item .type-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.bill-item .type-icon.food { background: #fff2e0; }
+.bill-item .type-icon.transport { background: #e0f0ff; }
+.bill-item .type-icon.hotel { background: #e8f5e9; }
+.bill-item .type-icon.ticket { background: #fce4ec; }
+.bill-item .type-icon.shopping { background: #f3e5f5; }
+.bill-item .type-icon.other { background: #f5f5f5; }
+.bill-item .info { flex: 1; min-width: 0; }
+.bill-item .info .top {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.bill-item .info .top .name { font-weight: 600; font-size: 15px; color: var(--text); }
+.bill-item .info .top .cost { font-weight: 700; font-size: 16px; color: var(--text); }
+.bill-item .info .meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+
+/* ============================================
+   Page: Add Bill
+   ============================================ */
+.bill-form { padding: 16px 20px; }
+.bill-form .amount-input {
+  font-size: 48px; font-weight: 800; text-align: center;
+  width: 100%; padding: 20px; border: none; background: transparent;
+  outline: none; color: var(--text);
+}
+.bill-form .amount-hint { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+.bill-form .label { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; margin-top: 16px; }
+.tag-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.tag-grid .tag {
+  padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border);
+  background: #fff; font-size: 14px; cursor: pointer; transition: all .2s;
+}
+.tag-grid .tag.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+.tag-grid .tag:active { transform: scale(.95); }
+
+.member-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.member-grid .member-tag {
+  padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border);
+  background: #fff; font-size: 14px; cursor: pointer; transition: all .2s;
+}
+.member-grid .member-tag.selected { border-color: var(--success); background: #e8f8e8; color: var(--success); font-weight: 600; }
+.member-grid .member-tag:active { transform: scale(.95); }
+
+/* ============================================
+   Bill Form v2 - 支付人 / 分摊人
+   ============================================ */
+.payer-row, .split-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  min-height: 44px; padding: 8px 12px;
+  background: #fff; border: 2px solid var(--border);
+  border-radius: var(--radius-sm); margin-bottom: 12px;
+}
+.payer-row .avatar, .split-row .avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; border: 2px solid var(--primary);
+  cursor: pointer;
+}
+.add-circle {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #f0f0f5; color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 300; border: 2px dashed var(--border);
+  cursor: pointer; transition: all .2s;
+}
+.add-circle:active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+/* 全体成员勾选 */
+.split-all-check {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0; font-size: 14px; cursor: pointer;
+}
+.split-all-check input { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+
+/* 账单分组 */
+.bill-section {
+  margin-bottom: 16px;
+}
+.bill-section-title {
+  font-size: 13px; font-weight: 600; color: var(--text-secondary);
+  padding: 8px 4px 4px; margin-bottom: 4px;
+}
+
+/* ============================================
+   Page: Settle
+   ============================================ */
+.settle-summary {
+  padding: 20px; text-align: center;
+  background: linear-gradient(135deg, #34c759, #007aff);
+  color: #fff;
+}
+.settle-summary .total { font-size: 36px; font-weight: 800; margin: 8px 0; }
+.settle-summary .per-person { font-size: 18px; opacity: .9; }
+
+.settle-detail { padding: 16px 20px; }
+.person-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 10px; box-shadow: var(--shadow);
+}
+.person-card .header {
+  display: flex; justify-content: space-between; align-items: center;
+  position: static; padding: 0; margin-bottom: 8px;
+  border: none; background: transparent; backdrop-filter: none;
+}
+.person-card .header .name { font-weight: 700; font-size: 16px; }
+.person-card .header .status { font-size: 14px; }
+.person-card .header .status.get { color: var(--danger); }
+.person-card .header .status.pay { color: var(--success); }
+.person-card .details { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+
+.transfer-list { padding: 0 20px; }
+.transfer-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; background: var(--card); border-radius: var(--radius);
+  margin-bottom: 8px; box-shadow: var(--shadow);
+}
+.transfer-item .arrow { font-size: 20px; color: var(--text-secondary); }
+.transfer-item .from { font-weight: 600; }
+.transfer-item .to { font-weight: 600; }
+.transfer-item .amount { font-weight: 700; color: var(--primary); margin-left: auto; font-size: 18px; }
+
+/* ============================================
+   Page: Admin
+   ============================================ */
+.admin-table { padding: 16px 20px; }
+.admin-table .row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.admin-table .row:last-child { border-bottom: none; }
+.admin-table .row .name { font-weight: 500; }
+.admin-table .row .email { font-size: 12px; color: var(--text-secondary); }
+.admin-table .row .role { font-size: 12px; padding: 2px 8px; border-radius: 12px; }
+.admin-table .row .role.admin { background: #fff2e0; color: #e68a00; }
+.admin-table .row .role.user { background: #f0f0f5; color: #666; }
+
+/* ============================================
+   Log page
+   ============================================ */
+.log-list { padding: 16px 20px; }
+.log-item {
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px; line-height: 1.6;
+  display: flex; gap: 8px;
+}
+.log-item .time { color: var(--text-secondary); white-space: nowrap; min-width: 60px; }
+.log-item .content { flex: 1; }
+
+/* ============================================
+   Bottom Nav
+   ============================================ */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 64px; background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px); border-top: 1px solid var(--border);
+  display: flex; align-items: center; z-index: 100;
+  padding: 0 16px var(--safe-bottom);
+  justify-content: space-around;
+}
+.bottom-nav button {
+  border: none; background: transparent;
+  font-size: 11px; color: var(--text-secondary); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  padding: 6px 16px; transition: color .2s;
+  position: relative;
+}
+.bottom-nav button .icon { font-size: 22px; }
+.bottom-nav button.active { color: var(--primary); font-weight: 600; }
+.bottom-nav .nav-fab {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  font-size: 28px; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,180,216,0.5);
+  margin-top: -20px; transition: transform .2s;
+  position: relative;
+}
+.bottom-nav .nav-fab:active { transform: scale(.9); }
+
+/* ============================================
+   Modal / Overlay
+   ============================================ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.5); z-index: 200;
+  align-items: flex-end; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal-content {
+  background: #fff; border-radius: var(--radius) var(--radius) 0 0;
+  padding: 24px 20px; width: 100%; max-width: 500px;
+  max-height: 80vh; overflow-y: auto;
+  animation: slideUp .3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-content h3 { font-size: 18px; margin-bottom: 16px; }
+
+/* ============================================
+   Pay method display
+   ============================================ */
+.pay-method {
+  background: #f8f8fa; border-radius: var(--radius-sm);
+  padding: 12px; margin-top: 8px; font-size: 13px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pay-method .label { color: var(--text-secondary); }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.8); color: #fff; padding: 12px 24px;
+  border-radius: 24px; font-size: 14px; z-index: 300;
+  display: none; animation: fadeIn .3s;
+}
+.toast.show { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (min-width: 600px) {
+  body { max-width: 480px; margin: 0 auto; background: #e5e5ea; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     Toast
+     ============================================ -->
+<div id="toast" class="toast"></div>
+
+<!-- ============================================
+     Modal Overlay
+     ============================================ -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal-content" id="modal-content">
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Login
+     ============================================ -->
+<div id="page-login" class="page">
+  <div class="inner">
+  <div class="logo">💰</div>
+  <h2>AA记账</h2>
+  <p class="sub">好友出游，分摊无忧</p>
+
+  <!-- Login form -->
+  <div id="login-form">
+    <input class="input" id="login-user" type="text" placeholder="用户名" autocomplete="username">
+    <input class="input" id="login-pass" type="password" placeholder="密码" autocomplete="current-password">
+    <button class="btn btn-primary" onclick="handleLogin()">登 录</button>
+    <div class="switch-link" onclick="showRegister()">没有账号？去注册</div>
+    <div class="switch-link" style="font-size:12px;color:var(--text-secondary);margin-top:4px;" onclick="showForgot()">忘记密码？</div>
+  </div>
+
+  <!-- Register form (hidden) -->
+  <div id="register-form" style="display:none;">
+    <input class="input" id="reg-user" type="text" placeholder="用户名">
+    <input class="input" id="reg-email" type="email" placeholder="邮箱（可选，用于找回密码）">
+    <input class="input" id="reg-pass" type="password" placeholder="密码">
+    <input class="input" id="reg-pass2" type="password" placeholder="确认密码">
+    <button class="btn btn-primary" onclick="handleRegister()">注 册</button>
+    <div class="switch-link" onclick="showLogin()">已有账号？去登录</div>
+  </div>
+
+  <!-- Forgot form (hidden) -->
+  <div id="forgot-form" style="display:none;">
+    <input class="input" id="forgot-email" type="email" placeholder="输入注册邮箱">
+    <button class="btn btn-primary" onclick="handleForgot()">发送重置邮件</button>
+    <div class="switch-link" onclick="showLogin()">返回登录</div>
+  </div>
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Home (我的项目)
+     ============================================ -->
+<div id="page-home" class="page">
+  <div style="padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <div style="font-size:24px;font-weight:800;color:var(--text);">你好呀</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="home-greeting"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary);font-weight:600;" id="home-avatar">G</div>
+      <button style="border:none;background:none;font-size:13px;color:var(--text-secondary);cursor:pointer;" onclick="logout()">退出</button>
+    </div>
+  </div>
+
+  <div class="join-section">
+    <input class="input" id="join-code" placeholder="输入分享码加入" style="text-transform:uppercase;">
+    <button class="btn btn-primary" onclick="handleJoin()">加入</button>
+  </div>
+
+  <div class="project-list" id="project-list">
+    <!-- 由 JS 渲染 -->
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Create Project
+     ============================================ -->
+<div id="page-project-new" class="page">
+  <div class="header">
+    <button class="back" onclick="navigate('#home')">←</button>
+    <h1>创建项目</h1>
+  </div>
+  <div style="padding:20px;">
+    <input class="input" id="new-name" placeholder="项目名称，如：2026年5月露营" style="margin-bottom:12px;">
+    <input class="input" id="new-date" type="month" style="margin-bottom:24px;">
+    <button class="btn btn-primary" onclick="handleCreateProject()">创建并进入</button>
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Room (项目房间)
+     ============================================ -->
+<div id="page-room" class="page">
+  <div class="header">
+    <button class="back" onclick="navigate('#home')">←</button>
+    <h1 id="room-title">项目名称</h1>
+    <button style="border:none;background:none;font-size:14px;color:var(--primary);font-weight:600;" onclick="shareRoom()">分享</button>
+  </div>
+
+  <div class="room-summary">
+    <div class="label-row">
+      <span class="label">我的支出</span>
+      <button class="settle-btn" onclick="navigateToSettle()">
+        全员结算 →
+      </button>
+    </div>
+    <div class="amount-row">
+      <span class="currency">¥</span>
+      <span class="total" id="room-total">0</span>
+    </div>
+    <div class="per-person" id="room-perperson">人均 ¥0</div>
+    <div id="room-category-summary" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+    </div>
+    <div class="members" id="room-members">
+    </div>
+  </div>
+
+  <div id="bill-list" style="padding:0 16px 80px;">
+    <!-- JS 渲染 -->
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Add Bill (记一笔)
+     ============================================ -->
+<div id="page-add-bill" class="page">
+  <div class="header">
+    <button class="back" onclick="navigateToRoom()">←</button>
+    <h1>记一笔</h1>
+  </div>
+
+  <!-- 步骤1: 金额 -->
+  <div id="bill-step-amount" class="bill-form">
+    <input class="amount-input" id="bill-amount" type="number" inputmode="decimal" placeholder="0" step="0.01">
+    <div class="amount-hint">输入支出金额</div>
+    <button class="btn btn-primary" onclick="billNextStep()">下一步</button>
+  </div>
+
+  <!-- 步骤2: 详情 -->
+  <div id="bill-step-detail" class="bill-form" style="display:none;">
+    <div style="font-size:24px;font-weight:800;text-align:center;margin-bottom:16px;">¥<span id="bill-amount-display">0</span></div>
+
+    <div class="label">标签</div>
+    <div class="tag-grid" id="bill-tags">
+      <span class="tag selected" data-tag="餐饮" onclick="selectTag(this)">🍜 餐饮</span>
+      <span class="tag" data-tag="交通" onclick="selectTag(this)">🚗 交通</span>
+      <span class="tag" data-tag="住宿" onclick="selectTag(this)">🏨 住宿</span>
+      <span class="tag" data-tag="门票" onclick="selectTag(this)">🎫 门票</span>
+      <span class="tag" data-tag="购物" onclick="selectTag(this)">🛍️ 购物</span>
+      <span class="tag" data-tag="其他" onclick="selectTag(this)">📦 其他</span>
+    </div>
+
+    <div class="label">支付人</div>
+    <div class="payer-row" id="bill-payer-row">
+      <!-- JS 渲染: 默认自己头像 + 加号 -->
+    </div>
+
+    <div class="label">分摊给</div>
+    <label class="split-all-check">
+      <input type="checkbox" id="bill-split-all" checked onchange="toggleSplitAll()"> 全体成员
+    </label>
+    <div class="split-row" id="bill-split-row" style="display:none;">
+      <!-- JS 渲染: 成员头像 + 加号 -->
+    </div>
+
+    <div class="label">备注</div>
+    <input class="input" id="bill-note" placeholder="如：火锅底料" style="margin-bottom:16px;">
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="billSaveAndContinue()">继续记下一笔</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="billSaveAndBack()">保存并返回</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Settle (结算)
+     ============================================ -->
+<div id="page-settle" class="page">
+  <div class="header">
+    <button class="back" onclick="navigateToRoom()">←</button>
+    <h1>结算</h1>
+    <button style="border:none;background:none;font-size:14px;color:var(--primary);font-weight:600;" onclick="copySettleText()">复制</button>
+  </div>
+
+  <div class="settle-summary">
+    <div style="font-size:13px;opacity:.8;">总支出</div>
+    <div class="total" id="settle-total">¥0</div>
+    <div class="per-person" id="settle-perperson">人均 ¥0</div>
+  </div>
+
+  <div class="settle-detail" id="settle-detail">
+    <!-- JS 渲染每人详情 -->
+  </div>
+
+  <div style="padding:0 20px;">
+    <div class="label">💡 最少转账方案</div>
+  </div>
+  <div class="transfer-list" id="transfer-list">
+    <!-- JS 渲染 -->
+  </div>
+
+  <div style="padding:16px 20px;">
+    <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+      <input type="checkbox" id="settle-done-check" onchange="toggleSettleDone()">
+      标记为已结算
+    </label>
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Bill Detail (账单详情)
+     ============================================ -->
+<div id="page-bill-detail" class="page">
+  <div class="header">
+    <button class="back" onclick="navigateToRoom()">←</button>
+    <h1>账单详情</h1>
+    <button style="border:none;background:none;font-size:14px;color:var(--danger);font-weight:600;" onclick="deleteBill()">删除</button>
+  </div>
+  <div id="bill-detail-content" style="padding:20px;">
+    <!-- JS 渲染 -->
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Logs (操作记录)
+     ============================================ -->
+<div id="page-logs" class="page">
+  <div class="header">
+    <button class="back" onclick="navigateToRoom()">←</button>
+    <h1>操作记录</h1>
+  </div>
+  <div class="log-list" id="log-list">
+    <!-- JS 渲染 -->
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Admin
+     ============================================ -->
+<div id="page-admin" class="page">
+  <div class="header">
+    <button class="back" onclick="navigate('#home')">←</button>
+    <h1>管理后台</h1>
+  </div>
+  <div class="admin-table" id="admin-table">
+    <!-- JS 渲染 -->
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE: Account
+     ============================================ -->
+<div id="page-account" class="page">
+  <div class="header">
+    <button class="back" onclick="navigate('#home')">←</button>
+    <h1>账号设置</h1>
+  </div>
+  <div style="padding:20px;">
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;">个人信息</div>
+      <div class="label" style="margin-top:0;">用户名</div>
+      <input class="input" id="acct-username" style="margin-bottom:12px;">
+      <div class="label">Zelle / 收款账号</div>
+      <input class="input" id="acct-zelle" placeholder="如：your@email.com" style="margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="saveAccount()">保存</button>
+    </div>
+    <div id="acct-admin-section" style="display:none;margin-bottom:16px;">
+      <button class="btn btn-outline" onclick="navigate('#admin')" style="width:100%;">管理后台</button>
+    </div>
+    <button class="btn btn-danger" onclick="logout()">退出登录</button>
+  </div>
+</div>
+
+<!-- ============================================
+     Bottom Nav
+     ============================================ -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="active" onclick="navigate('#home')"><span class="icon">🏠</span>主页</button>
+  <button class="nav-fab" id="nav-fab-btn">＋</button>
+  <button id="nav-account-btn" onclick="handleAccountClick()"><span class="icon">👤</span>账号</button>
+</div>
+
+<script>
+// ============================================
+// 数据层 (Mock)
+// ============================================
+const DB = {
+  currentUser: null,
+  users: [
+    { id: 'u1', username: 'GG', email: 'gg@test.com', password: '123', role: 'admin', zelle: 'gg@bank.com' },
+    { id: 'u2', username: '小王', email: 'xw@test.com', password: '123', role: 'user', zelle: 'xw@pay.com' },
+  ],
+  projects: [
+    {
+      id: 'p1', name: '2026年5月露营', date: '2026-05', code: 'zxvf',
+      createdBy: 'u1', settled: false,
+      members: ['u1', 'u2'],
+      bills: [
+        { id: 'b1', amount: 300, tag: '餐饮', payer: 'u1', split: ['u1','u2'], note: '火锅', paymethod: '', createdAt: '2026-05-18 20:30' },
+        { id: 'b2', amount: 120, tag: '交通', payer: 'u2', split: ['u1','u2'], note: '打车去营地', paymethod: '', createdAt: '2026-05-18 20:35' },
+      ],
+      logs: [
+        { time: '05-18 20:30', text: 'GG 创建了项目' },
+        { time: '05-18 20:30', text: '小王 加入了项目' },
+        { time: '05-18 20:31', text: 'GG 添加了账单「火锅 ¥300」' },
+      ]
+    }
+  ]
+};
+
+// ============================================
+// Router
+// ============================================
+function navigate(hash) {
+  window.location.hash = hash;
+  renderRoute();
+}
+
+window.addEventListener('hashchange', renderRoute);
+window.addEventListener('load', () => {
+  if (!window.location.hash) window.location.hash = '#login';
+  renderRoute();
+});
+
+function renderRoute() {
+  const hash = window.location.hash || '#login';
+
+  // 检查登录
+  if (!DB.currentUser && !hash.startsWith('#login') && !hash.startsWith('#forgot') && !hash.startsWith('#register')) {
+    navigate('#login');
+    return;
+  }
+
+  // 隐藏所有页面
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  // 隐藏/显示 bottom nav
+  const nav = document.getElementById('bottom-nav');
+  const showNav = ['#home', '#room', '#settle', '#admin', '#bill', '#logs'].some(h => hash.startsWith(h));
+  nav.style.display = (DB.currentUser && showNav) ? 'flex' : 'none';
+
+  // 底部 + 号功能
+  const fabBtn = document.getElementById('nav-fab-btn');
+  if (fabBtn) {
+    if (hash.startsWith('#room/')) {
+      fabBtn.onclick = navigateToAddBill;
+    } else {
+      fabBtn.onclick = () => navigate('#project/new');
+    }
+  }
+
+  const mainHash = hash.split('?')[0].split('/')[0];
+
+  if (hash.startsWith('#login') || hash.startsWith('#register') || hash.startsWith('#forgot')) {
+    document.getElementById('page-login').classList.add('active');
+    if (hash === '#register') showRegister();
+    else if (hash === '#forgot') showForgot();
+    else showLogin();
+  }
+  else if (hash === '#home') {
+    document.getElementById('page-home').classList.add('active');
+    renderHome();
+  }
+  else if (hash === '#project/new') {
+    document.getElementById('page-project-new').classList.add('active');
+    document.getElementById('new-date').value = new Date().toISOString().slice(0,7);
+  }
+  else if (hash.startsWith('#room/')) {
+    document.getElementById('page-room').classList.add('active');
+    renderRoom();
+  }
+  else if (hash.startsWith('#bill/') && hash.includes('/add')) {
+    document.getElementById('page-add-bill').classList.add('active');
+    initAddBill();
+  }
+  else if (hash.startsWith('#bill/') && hash.includes('/detail/')) {
+    document.getElementById('page-bill-detail').classList.add('active');
+    renderBillDetail();
+  }
+  else if (hash.startsWith('#settle')) {
+    document.getElementById('page-settle').classList.add('active');
+    renderSettle();
+  }
+  else if (hash === '#logs') {
+    document.getElementById('page-logs').classList.add('active');
+    const pid = getCurrentProjectId();
+    renderLogs(pid);
+  }
+  else if (hash === '#admin') {
+    document.getElementById('page-admin').classList.add('active');
+    renderAdmin();
+  }
+  else if (hash === '#account') {
+    document.getElementById('page-account').classList.add('active');
+    renderAccount();
+  }
+}
+
+function getCurrentProjectId() {
+  const hash = window.location.hash;
+  const m = hash.match(/room\/([^\/]+)/);
+  return m ? m[1] : null;
+}
+
+function findProject(id) {
+  return DB.projects.find(p => p.id === id);
+}
+function findUser(id) {
+  return DB.users.find(u => u.id === id);
+}
+function findUserByName(name) {
+  return DB.users.find(u => u.username === name);
+}
+
+// ============================================
+// 登录 / 注册
+// ============================================
+function showLogin() {
+  document.getElementById('login-form').style.display = '';
+  document.getElementById('register-form').style.display = 'none';
+  document.getElementById('forgot-form').style.display = 'none';
+  document.querySelector('#page-login h2').textContent = 'AA记账';
+}
+
+function showRegister() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('register-form').style.display = '';
+  document.getElementById('forgot-form').style.display = 'none';
+  document.querySelector('#page-login h2').textContent = '注册';
+}
+
+function showForgot() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('register-form').style.display = 'none';
+  document.getElementById('forgot-form').style.display = '';
+  document.querySelector('#page-login h2').textContent = '找回密码';
+}
+
+function handleLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  const found = DB.users.find(u => u.username === user && u.password === pass);
+  if (found) {
+    DB.currentUser = found;
+    showToast('登录成功');
+    navigate('#home');
+  } else {
+    showToast('用户名或密码错误');
+  }
+}
+
+function handleRegister() {
+  const user = document.getElementById('reg-user').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value.trim();
+  const pass2 = document.getElementById('reg-pass2').value.trim();
+  if (!user) return showToast('请输入用户名');
+  if (pass !== pass2) return showToast('两次密码不一致');
+  if (DB.users.find(u => u.username === user)) return showToast('用户名已存在');
+  const newUser = {
+    id: 'u' + Date.now(),
+    username: user,
+    email: email,
+    password: pass,
+    role: 'user'
+  };
+  DB.users.push(newUser);
+  showToast('注册成功，请登录');
+  showLogin();
+}
+
+function handleForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const found = DB.users.find(u => u.email === email);
+  if (found) {
+    showToast('重置链接已发送到你的邮箱（演示模式）');
+  } else {
+    showToast('未找到该邮箱');
+  }
+}
+
+function logout() {
+  DB.currentUser = null;
+  navigate('#login');
+}
+
+// ============================================
+// Home
+// ============================================
+function renderHome() {
+  const list = document.getElementById('project-list');
+  // 更新问候语
+  const user = DB.currentUser;
+  if (user) {
+    document.getElementById('home-greeting').textContent = user.username + '，你有 ' + DB.projects.filter(p => p.members.includes(user.id)).length + ' 个项目';
+    document.getElementById('home-avatar').textContent = user.username.charAt(0).toUpperCase();
+  }
+  const myProjects = DB.projects.filter(p => p.members.includes(DB.currentUser.id));
+  if (myProjects.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:60px 0;">还没有项目，点右下角 ＋ 创建一个</p>';
+    return;
+  }
+  list.innerHTML = myProjects.map(p => {
+    const total = p.bills.reduce((s, b) => s + b.amount, 0);
+    return `<div class="project-item" onclick="navigate('#room/${p.id}')">
+      <div class="emoji">🏕️</div>
+      <div class="info">
+        <h3>${p.name}</h3>
+        <p>${p.members.length}人 · ${p.bills.length}笔</p>
+      </div>
+      <div class="amount">¥${total}</div>
+    </div>`;
+  }).join('');
+}
+
+function handleJoin() {
+  const code = document.getElementById('join-code').value.trim().toLowerCase();
+  const p = DB.projects.find(pr => pr.code === code);
+  if (!p) return showToast('未找到该分享码');
+  if (p.members.includes(DB.currentUser.id)) return showToast('你已在项目中');
+  p.members.push(DB.currentUser.id);
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 通过链接加入了项目' });
+  showToast('已加入项目');
+  navigate('#room/' + p.id);
+}
+
+function handleCreateProject() {
+  const name = document.getElementById('new-name').value.trim();
+  const date = document.getElementById('new-date').value;
+  if (!name) return showToast('请输入项目名称');
+  const code = Math.random().toString(36).substring(2, 6).toLowerCase();
+  const p = {
+    id: 'p' + Date.now(),
+    name, date, code,
+    createdBy: DB.currentUser.id,
+    settled: false,
+    members: [DB.currentUser.id],
+    bills: [],
+    logs: [{ time: formatTime(new Date()), text: DB.currentUser.username + ' 创建了项目「' + name + '」' }]
+  };
+  DB.projects.push(p);
+  showToast('项目已创建，分享码：' + code);
+  navigate('#room/' + p.id);
+}
+
+// ============================================
+// Room
+// ============================================
+function renderRoom() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  document.getElementById('room-title').textContent = p.name;
+
+  const total = p.bills.reduce((s, b) => s + b.amount, 0);
+  const perPerson = p.members.length > 0 ? (total / p.members.length) : 0;
+  document.getElementById('room-total').textContent = '¥' + total;
+  document.getElementById('room-perperson').textContent = '人均 ¥' + perPerson.toFixed(1);
+
+  // 成员 - 可点击查看信息
+  document.getElementById('room-members').innerHTML = p.members.map(id => {
+    const u = findUser(id);
+    const initial = u ? u.username.charAt(0) : '?';
+    return `<span class="avatar" onclick="showMemberInfo('${id}')">${initial}</span>`;
+  }).join('');
+
+  // 分类汇总（放在蓝色卡片内）
+  const cats = {};
+  p.bills.forEach(b => {
+    cats[b.tag] = (cats[b.tag] || 0) + b.amount;
+  });
+  const catEmojis = { '餐饮':'🍜', '交通':'🚗', '住宿':'🏨', '门票':'🎫', '购物':'🛍️', '其他':'📦' };
+  const catSummary = document.getElementById('room-category-summary');
+  if (Object.keys(cats).length > 0) {
+    catSummary.innerHTML = Object.entries(cats).map(([tag, amt]) =>
+      `<span class="badge" style="background:rgba(255,255,255,.15);color:#fff;">${catEmojis[tag]||'📦'} ${tag} ¥${amt}</span>`
+    ).join('');
+    if (p.settled) {
+      catSummary.innerHTML += '<span class="badge" style="background:#e8f8e8;color:#34c759;margin-left:6px;">✅ 已结算</span>';
+    }
+  } else {
+    catSummary.innerHTML = '';
+  }
+
+  // 账单列表 - 分"我付的" / "别人帮我付"
+  const catIconCls = { '餐饮':'food', '交通':'transport', '住宿':'hotel', '门票':'ticket', '购物':'shopping', '其他':'other' };
+  const list = document.getElementById('bill-list');
+  if (p.bills.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:60px 0;">还没有账单<br><span style="font-size:32px;display:block;margin-bottom:12px;">📋</span>点击下方 ＋ 记一笔</p>';
+    return;
+  }
+
+  const myId = DB.currentUser.id;
+  const myPaid = p.bills.filter(b => b.payer === myId);
+  const othersPaid = p.bills.filter(b => b.payer !== myId);
+
+  function renderBillItem(b) {
+    const payer = findUser(b.payer);
+    const iconCls = catIconCls[b.tag] || 'other';
+    return `<div class="bill-item" onclick="navigate('#room/${pid}/detail/${b.id}')">
+      <div class="type-icon ${iconCls}">${catEmojis[b.tag]||'📦'}</div>
+      <div class="info">
+        <div class="top">
+          <span class="name">${b.note || b.tag}</span>
+          <span class="cost">¥${b.amount}</span>
+        </div>
+        <div class="meta">${payer ? payer.username : '?'} 付款 · ${b.split.length}人分摊</div>
+      </div>
+    </div>`;
+  }
+
+  let html = '';
+  if (myPaid.length > 0) {
+    html += '<div class="bill-section"><div class="bill-section-title">我付的</div>';
+    html += myPaid.map(renderBillItem).join('');
+    html += '</div>';
+  }
+  if (othersPaid.length > 0) {
+    html += '<div class="bill-section"><div class="bill-section-title">别人帮我付</div>';
+    html += othersPaid.map(renderBillItem).join('');
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+
+function shareRoom() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  // 模拟复制分享链接
+  const link = `https://aa-app.workers.dev/join?code=${p.code}`;
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('分享链接已复制：' + p.code);
+  }).catch(() => {
+    showToast('分享码：' + p.code + '（链接：' + link + '）');
+  });
+}
+
+// ============================================
+// Member Info
+// ============================================
+function showMemberInfo(userId) {
+  const u = findUser(userId);
+  if (!u) return;
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <h3>👤 成员信息</h3>
+    <div style="text-align:center;padding:12px 0;">
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:var(--primary);margin:0 auto 8px;">${u.username.charAt(0)}</div>
+      <div style="font-size:18px;font-weight:600;">${u.username}</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">${u.email || '未设置邮箱'}</div>
+      ${u.zelle ? '<div style="margin-top:10px;padding:8px 12px;background:#f0f8ff;border-radius:8px;font-size:13px;">💳 Zelle: ' + u.zelle + '</div>' : ''}
+    </div>
+    <button class="btn btn-outline" onclick="document.getElementById('modal-overlay').classList.remove('show')" style="margin-top:8px;">关闭</button>
+  `;
+  overlay.classList.add('show');
+}
+
+// ============================================
+// Add Bill
+// ============================================
+let billDraft = {};
+
+function navigateToAddBill() {
+  const pid = getCurrentProjectId();
+  navigate(`#bill/${pid}/add`);
+}
+
+function navigateToRoom() {
+  const pid = getCurrentProjectId();
+  navigate(`#room/${pid}`);
+}
+
+function initAddBill() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  billDraft = { projectId: pid, payers: [DB.currentUser.id] };
+
+  // 重置步骤
+  document.getElementById('bill-step-amount').style.display = '';
+  document.getElementById('bill-step-detail').style.display = 'none';
+  document.getElementById('bill-amount').value = '';
+
+  // 支付人 - 默认自己头像 + 加号
+  const payerRow = document.getElementById('bill-payer-row');
+  renderPayerRow(payerRow, p, [DB.currentUser.id]);
+
+  // 分摊人 - 默认全体成员勾选
+  document.getElementById('bill-split-all').checked = true;
+  document.getElementById('bill-split-row').style.display = 'none';
+  const splitRow = document.getElementById('bill-split-row');
+  renderSplitRow(splitRow, p, p.members);
+}
+
+function renderPayerRow(container, p, selectedIds) {
+  container.innerHTML = selectedIds.map(id => {
+    const u = findUser(id);
+    return `<span class="avatar" onclick="removePayer('${id}')">${u ? u.username.charAt(0) : '?'}</span>`;
+  }).join('') + '<span class="add-circle" onclick="showPayerPicker()">+</span>';
+}
+
+function renderSplitRow(container, p, selectedIds) {
+  container.innerHTML = selectedIds.map(id => {
+    const u = findUser(id);
+    return `<span class="avatar" onclick="removeSplitMember('${id}')">${u ? u.username.charAt(0) : '?'}</span>`;
+  }).join('') + '<span class="add-circle" onclick="showSplitPicker()">+</span>';
+}
+
+function toggleSplitAll() {
+  const checked = document.getElementById('bill-split-all').checked;
+  document.getElementById('bill-split-row').style.display = checked ? 'none' : 'flex';
+  if (checked) {
+    billDraft.splitAll = true;
+  } else {
+    billDraft.splitAll = false;
+    // 默认全部成员选中
+    const pid = getCurrentProjectId();
+    const p = findProject(pid);
+    if (p) renderSplitRow(document.getElementById('bill-split-row'), p, p.members);
+  }
+}
+
+function removePayer(id) {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  let payers = billDraft.payers || [DB.currentUser.id];
+  if (payers.length <= 1) return showToast('至少需要一位支付人');
+  payers = payers.filter(pid2 => pid2 !== id);
+  billDraft.payers = payers;
+  renderPayerRow(document.getElementById('bill-payer-row'), p, payers);
+}
+
+function removeSplitMember(id) {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  let split = billDraft.customSplit || [...p.members];
+  if (split.length <= 1) return showToast('至少需要一位分摊人');
+  split = split.filter(sid => sid !== id);
+  billDraft.customSplit = split;
+  renderSplitRow(document.getElementById('bill-split-row'), p, split);
+}
+
+function showPayerPicker() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  const currentPayers = billDraft.payers || [DB.currentUser.id];
+  showMemberPicker(p.members.filter(id => !currentPayers.includes(id)), (selected) => {
+    billDraft.payers = [...currentPayers, ...selected];
+    renderPayerRow(document.getElementById('bill-payer-row'), p, billDraft.payers);
+  });
+}
+
+function showSplitPicker() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  const currentSplit = billDraft.customSplit || [...p.members];
+  showMemberPicker(p.members.filter(id => !currentSplit.includes(id)), (selected) => {
+    billDraft.customSplit = [...currentSplit, ...selected];
+    renderSplitRow(document.getElementById('bill-split-row'), p, billDraft.customSplit);
+  });
+}
+
+function showMemberPicker(availableIds, onDone) {
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  const users = availableIds.map(id => findUser(id)).filter(Boolean);
+  if (users.length === 0) return showToast('没有更多成员可添加');
+  
+  window._pickerSelected = [];
+  content.innerHTML = `
+    <h3>选择成员</h3>
+    ${users.map(u => `
+      <label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+        <input type="checkbox" data-id="${u.id}" style="width:18px;height:18px;accent-color:var(--primary);" onchange="if(this.checked) window._pickerSelected.push('${u.id}'); else window._pickerSelected=window._pickerSelected.filter(i=>i!=='${u.id}')">
+        <span style="width:36px;height:36px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--primary);">${u.username.charAt(0)}</span>
+        <span style="font-size:15px;">${u.username}</span>
+      </label>
+    `).join('')}
+    <button class="btn btn-primary" style="margin-top:16px;" onclick="confirmMemberPicker()">确定添加</button>
+  `;
+  window._pickerOnDone = onDone;
+  overlay.classList.add('show');
+}
+
+function confirmMemberPicker() {
+  const checks = document.querySelectorAll('#modal-content input[type=checkbox]:checked');
+  const selected = Array.from(checks).map(c => c.dataset.id);
+  if (selected.length === 0) return showToast('请选择至少一人');
+  if (window._pickerOnDone) window._pickerOnDone(selected);
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+
+function billNextStep() {
+  const amount = parseFloat(document.getElementById('bill-amount').value);
+  if (!amount || amount <= 0) return showToast('请输入有效金额');
+  billDraft.amount = amount;
+  document.getElementById('bill-step-amount').style.display = 'none';
+  document.getElementById('bill-step-detail').style.display = '';
+  document.getElementById('bill-amount-display').textContent = amount;
+}
+
+function selectTag(el) {
+  document.querySelectorAll('#bill-tags .tag').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function billSaveAndContinue() {
+  saveBill();
+  initAddBill(); // 重新初始化
+  document.getElementById('bill-amount').focus();
+}
+
+function billSaveAndBack() {
+  saveBill();
+  navigateToRoom();
+}
+
+function saveBill() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+
+  const amount = billDraft.amount;
+  const tag = document.querySelector('#bill-tags .tag.selected')?.dataset?.tag || '其他';
+  const note = document.getElementById('bill-note').value.trim() || tag;
+  const payers = billDraft.payers || [DB.currentUser.id];
+  const payer = payers[0]; // 主支付人（兼容旧数据）
+  
+  let split;
+  if (document.getElementById('bill-split-all').checked) {
+    split = [...p.members];
+  } else {
+    split = billDraft.customSplit || [...p.members];
+  }
+
+  if (split.length === 0) return showToast('请选择至少一人分摊');
+
+  const bill = {
+    id: 'b' + Date.now(),
+    amount, tag, payer, payers, split, note,
+    createdBy: DB.currentUser.id,
+    createdAt: formatTime(new Date())
+  };
+  p.bills.push(bill);
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 添加了账单「' + note + ' ¥' + amount + '」' });
+  showToast('已保存');
+}
+
+// ============================================
+// Bill Detail
+// ============================================
+function renderBillDetail() {
+  const hash = window.location.hash;
+  const m = hash.match(/room\/([^/]+)\/detail\/([^/]+)/);
+  if (!m) return;
+  const pid = m[1], bid = m[2];
+  const p = findProject(pid);
+  if (!p) return;
+  const bill = p.bills.find(b => b.id === bid);
+  if (!bill) return;
+
+  const payers = bill.payers || [bill.payer];
+  const payerName = payers.map(id => { const u = findUser(id); return u ? u.username : '?'; }).join('、');
+  const tagEmoji = { '餐饮':'🍜', '交通':'🚗', '住宿':'🏨', '门票':'🎫', '购物':'🛍️', '其他':'📦' };
+  const isOwner = bill.createdBy === DB.currentUser.id || DB.currentUser.role === 'admin' || p.createdBy === DB.currentUser.id;
+
+  document.getElementById('bill-detail-content').innerHTML = `
+    <div style="text-align:center;font-size:48px;margin-bottom:4px;">${tagEmoji[bill.tag]||'📦'}</div>
+    <div style="text-align:center;font-size:36px;font-weight:800;margin-bottom:24px;">¥${bill.amount}</div>
+    <div class="card">
+      <div style="margin-bottom:12px;">
+        <span style="color:var(--text-secondary);font-size:13px;">标签</span><br>
+        <span style="font-weight:500;">${bill.tag}</span>
+      </div>
+      <div style="margin-bottom:12px;">
+        <span style="color:var(--text-secondary);font-size:13px;">支付人</span><br>
+        <div style="display:flex;gap:6px;margin-top:4px;">${payers.map(id => { const u = findUser(id); return `<span class="avatar" style="width:28px;height:28px;font-size:11px;background:var(--primary-light);color:var(--primary);border:1px solid var(--primary);" onclick="showMemberInfo('${id}')">${u ? u.username.charAt(0) : '?'}</span>`; }).join('')}</div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <span style="color:var(--text-secondary);font-size:13px;">分摊给</span><br>
+        <div style="display:flex;gap:6px;margin-top:4px;">${bill.split.map(id => { const u = findUser(id); return `<span class="avatar" style="width:28px;height:28px;font-size:11px;background:#f0f0f5;color:#666;border:1px solid #ddd;" onclick="showMemberInfo('${id}')">${u ? u.username.charAt(0) : '?'}</span>`; }).join('')}</div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <span style="color:var(--text-secondary);font-size:13px;">备注</span><br>
+        <span>${bill.note || '无'}</span>
+      </div>
+      ${bill.createdAt ? `<div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">记录于 ${bill.createdAt}</div>` : ''}
+    </div>
+  `;
+}
+
+function deleteBill() {
+  if (!confirm('确认删除此账单？')) return;
+  const hash = window.location.hash;
+  const m = hash.match(/room\/([^/]+)\/detail\/([^/]+)/);
+  if (!m) return;
+  const pid = m[1], bid = m[2];
+  const p = findProject(pid);
+  if (!p) return;
+  const idx = p.bills.findIndex(b => b.id === bid);
+  if (idx === -1) return;
+  const bill = p.bills[idx];
+  if (bill.createdBy !== DB.currentUser.id && DB.currentUser.role !== 'admin' && p.createdBy !== DB.currentUser.id) {
+    return showToast('无权删除此账单');
+  }
+  p.bills.splice(idx, 1);
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 删除了账单「' + bill.note + '」' });
+  showToast('已删除');
+  navigateToRoom();
+}
+
+// ============================================
+// Settle
+// ============================================
+function navigateToSettle() {
+  const pid = getCurrentProjectId();
+  navigate(`#settle/${pid}`);
+}
+
+function renderSettle() {
+  const hash = window.location.hash;
+  const m = hash.match(/settle\/([^/]+)/);
+  const pid = m ? m[1] : getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p || p.bills.length === 0) {
+    document.getElementById('settle-total').textContent = '¥0';
+    document.getElementById('settle-perperson').textContent = '暂无账单';
+    document.getElementById('settle-detail').innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px 0;">还没有账单</p>';
+    document.getElementById('transfer-list').innerHTML = '';
+    return;
+  }
+
+  const total = p.bills.reduce((s, b) => s + b.amount, 0);
+  const perPerson = total / p.members.length;
+  document.getElementById('settle-total').textContent = '¥' + total;
+  document.getElementById('settle-perperson').textContent = '人均 ¥' + perPerson.toFixed(1);
+  document.getElementById('settle-done-check').checked = p.settled;
+
+  // 每人统计
+  const stats = {};
+  p.members.forEach(id => { stats[id] = { paid: 0, share: 0 }; });
+  p.bills.forEach(b => {
+    if (stats[b.payer]) stats[b.payer].paid += b.amount;
+    const perShare = b.amount / b.split.length;
+    b.split.forEach(id => { if (stats[id]) stats[id].share += perShare; });
+  });
+
+  const detailDiv = document.getElementById('settle-detail');
+  detailDiv.innerHTML = p.members.map(id => {
+    const u = findUser(id);
+    const s = stats[id];
+    if (!u || !s) return '';
+    const balance = s.paid - s.share;
+    const isGet = balance > 0;
+    return `<div class="person-card">
+      <div class="header">
+        <span class="name">${u.username}${id === p.createdBy ? ' 👑' : ''}</span>
+        <span class="status ${isGet ? 'get' : 'pay'}">${isGet ? '💰 应收 ¥' + balance.toFixed(1) : '💸 应付 ¥' + Math.abs(balance).toFixed(1)}</span>
+      </div>
+      <div class="details">
+        付了 ¥${s.paid.toFixed(1)} · 应摊 ¥${s.share.toFixed(1)}
+      </div>
+    </div>`;
+  }).join('');
+
+  // 最少转账方案
+  const transfers = calculateTransfers(p.members.map(id => ({
+    id, balance: (stats[id]?.paid || 0) - (stats[id]?.share || 0)
+  })));
+  const transferDiv = document.getElementById('transfer-list');
+  if (transfers.length === 0) {
+    transferDiv.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px 0;">无需转账，已两清</p>';
+  } else {
+    transferDiv.innerHTML = transfers.map(t => {
+      const from = findUser(t.from);
+      const to = findUser(t.to);
+      return `<div class="transfer-item">
+        <span class="from">${from ? from.username : '?'}</span>
+        <span class="arrow">→</span>
+        <span class="to">${to ? to.username : '?'}</span>
+        <span class="amount">¥${t.amount.toFixed(1)}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+function calculateTransfers(balances) {
+  const pos = balances.filter(b => b.balance > 0).sort((a, b) => b.balance - a.balance);
+  const neg = balances.filter(b => b.balance < 0).sort((a, b) => a.balance - b.balance);
+  const transfers = [];
+  let i = 0, j = 0;
+  while (i < pos.length && j < neg.length) {
+    const amount = Math.min(pos[i].balance, -neg[j].balance);
+    if (amount > 0.01) {
+      transfers.push({ from: neg[j].id, to: pos[i].id, amount: Math.round(amount * 100) / 100 });
+    }
+    pos[i].balance -= amount;
+    neg[j].balance += amount;
+    if (pos[i].balance < 0.01) i++;
+    if (neg[j].balance > -0.01) j++;
+  }
+  return transfers;
+}
+
+function toggleSettleDone() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  p.settled = document.getElementById('settle-done-check').checked;
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + (p.settled ? ' 标记了已结算' : ' 取消了结算标记') });
+  showToast(p.settled ? '已标记结算' : '已取消结算标记');
+}
+
+function copySettleText() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  const total = p.bills.reduce((s, b) => s + b.amount, 0);
+  const perPerson = total / p.members.length;
+
+  let text = `📊 ${p.name} 结算结果\n`;
+  text += `总支出：¥${total} | 人均：¥${perPerson.toFixed(1)}\n\n`;
+
+  const stats = {};
+  p.members.forEach(id => { stats[id] = { paid: 0, share: 0 }; });
+  p.bills.forEach(b => {
+    if (stats[b.payer]) stats[b.payer].paid += b.amount;
+    const perShare = b.amount / b.split.length;
+    b.split.forEach(id => { if (stats[id]) stats[id].share += perShare; });
+  });
+
+  p.members.forEach(id => {
+    const u = findUser(id);
+    const s = stats[id];
+    if (!u || !s) return;
+    const balance = s.paid - s.share;
+    text += `${u.username}：付了¥${s.paid.toFixed(1)}，应摊¥${s.share.toFixed(1)}，${balance >= 0 ? '应收' : '应付'}¥${Math.abs(balance).toFixed(1)}\n`;
+  });
+
+  text += '\n💡 转账方案：\n';
+  const transfers = calculateTransfers(p.members.map(id => ({
+    id, balance: (stats[id]?.paid || 0) - (stats[id]?.share || 0)
+  })));
+  transfers.forEach(t => {
+    const from = findUser(t.from);
+    const to = findUser(t.to);
+    text += `${from ? from.username : '?'} → ${to ? to.username : '?'}：¥${t.amount.toFixed(1)}\n`;
+  });
+
+  navigator.clipboard.writeText(text).then(() => showToast('结算结果已复制')).catch(() => showToast('复制失败'));
+}
+
+// ============================================
+// Logs
+// ============================================
+function renderLogs(pid) {
+  const p = findProject(pid);
+  if (!p) { document.getElementById('log-list').innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px 0;">请先进入一个项目</p>'; return; }
+  document.getElementById('log-list').innerHTML = p.logs.reverse().map(l =>
+    `<div class="log-item"><span class="time">${l.time}</span><span class="content">${l.text}</span></div>`
+  ).join('');
+}
+
+// ============================================
+// Admin
+// ============================================
+function renderAdmin() {
+  if (DB.currentUser?.role !== 'admin') {
+    document.getElementById('admin-table').innerHTML = '<p style="text-align:center;color:var(--danger);padding:40px 0;">无权访问</p>';
+    return;
+  }
+  document.getElementById('admin-table').innerHTML = DB.users.map(u =>
+    `<div class="row">
+      <div>
+        <div class="name">${u.username}${DB.currentUser.id === u.id ? '（你）' : ''}</div>
+        <div class="email">${u.email || '未设邮箱'}</div>
+      </div>
+      <span class="role ${u.role}">${u.role === 'admin' ? '管理员' : '用户'}</span>
+    </div>`
+  ).join('');
+}
+
+// ============================================
+// Utils
+// ============================================
+function handleAccountClick() {
+  navigate('#account');
+}
+function renderAccount() {
+  const u = DB.currentUser;
+  if (!u) return;
+  document.getElementById('acct-username').value = u.username || '';
+  document.getElementById('acct-zelle').value = u.zelle || '';
+  const adminSec = document.getElementById('acct-admin-section');
+  if (adminSec) adminSec.style.display = (u.role === 'admin') ? '' : 'none';
+}
+function saveAccount() {
+  const u = DB.currentUser;
+  if (!u) return;
+  u.username = document.getElementById('acct-username').value.trim() || u.username;
+  u.zelle = document.getElementById('acct-zelle').value.trim();
+  showToast('已保存');
+  navigate('#home');
+}
+function formatTime(d) {
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>

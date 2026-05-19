@@ -343,6 +343,19 @@ body {
 .avatar-option.selected { border-color: var(--primary); transform: scale(1.1); }
 .avatar-option:active { transform: scale(.9); }
 
+/* ========== Emoji Grid ========== */
+.emoji-grid {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 4px 0;
+}
+.emoji-opt {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; cursor: pointer; border: 2px solid var(--border);
+  background: #fff; transition: all .2s;
+}
+.emoji-opt.selected { border-color: var(--primary); background: var(--primary-light); transform: scale(1.1); }
+.emoji-opt:active { transform: scale(.9); }
+
 /* Toast */
 .toast {
   position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
@@ -419,8 +432,10 @@ body {
   </div>
   <div style="padding:20px;">
     <input class="input" id="new-name" placeholder="项目名称，如：2026年5月露营" style="margin-bottom:12px;">
-    <input class="input" id="new-date" type="month" style="margin-bottom:24px;">
-    <button class="btn btn-primary" onclick="handleCreateProject()">创建并进入</button>
+    <input class="input" id="new-date" type="month" style="margin-bottom:16px;">
+    <div class="label" style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">项目图标</div>
+    <div class="emoji-grid" id="project-emoji-grid"></div>
+    <button class="btn btn-primary" onclick="handleCreateProject()" style="margin-top:20px;">创建并进入</button>
   </div>
 </div>
 
@@ -428,7 +443,11 @@ body {
 <div id="page-room" class="page">
   <div class="header">
     <button class="back" onclick="navigate('#home')">←</button>
-    <h1 id="room-title">项目名称</h1>
+    <div style="flex:1;display:flex;align-items:center;gap:6px;">
+      <span id="room-emoji" style="font-size:18px;"></span>
+      <h1 id="room-title" style="flex:1;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">项目名称</h1>
+      <span id="room-rename-btn" style="font-size:15px;cursor:pointer;padding:2px 4px;" onclick="showRenameModal()">✏️</span>
+    </div>
     <button style="border:none;background:none;font-size:14px;color:var(--primary);font-weight:600;" onclick="shareRoom()">分享</button>
   </div>
   <div class="room-summary">
@@ -468,13 +487,13 @@ body {
       <span class="tag" data-tag="购物" onclick="selectTag(this)">🛍️ 购物</span>
       <span class="tag" data-tag="其他" onclick="selectTag(this)">📦 其他</span>
     </div>
+    <div class="label">备注</div>
+    <input class="input" id="bill-note" placeholder="如：火锅底料" style="margin-bottom:16px;">
     <div class="label">支付人</div>
     <div class="payer-row" id="bill-payer-row"></div>
     <div class="label">分摊给</div>
     <label class="split-all-check"><input type="checkbox" id="bill-split-all" checked onchange="toggleSplitAll()"> 全体成员</label>
     <div class="split-row" id="bill-split-row" style="display:none;"></div>
-    <div class="label">备注</div>
-    <input class="input" id="bill-note" placeholder="如：火锅底料" style="margin-bottom:16px;">
     <div style="display:flex;gap:8px;">
       <button class="btn btn-outline" style="flex:1;" onclick="billSaveAndContinue()">继续记下一笔</button>
       <button class="btn btn-primary" style="flex:1;" onclick="billSaveAndBack()">保存并返回</button>
@@ -697,7 +716,7 @@ function renderRoute() {
     else showLogin();
   }
   else if (hash === '#home') { document.getElementById('page-home').classList.add('active'); renderHome(); }
-  else if (hash === '#project/new') { document.getElementById('page-project-new').classList.add('active'); document.getElementById('new-date').value = new Date().toISOString().slice(0,7); }
+  else if (hash === '#project/new') { document.getElementById('page-project-new').classList.add('active'); document.getElementById('new-date').value = new Date().toISOString().slice(0,7); initProjectEmoji(); }
   else if (hash.startsWith('#room/')) { document.getElementById('page-room').classList.add('active'); renderRoom(); }
   else if (hash.startsWith('#bill/') && hash.includes('/add')) { document.getElementById('page-add-bill').classList.add('active'); initAddBill(); }
   else if (hash.startsWith('#bill/') && hash.includes('/detail/')) { document.getElementById('page-bill-detail').classList.add('active'); renderBillDetail(); }
@@ -800,7 +819,7 @@ function renderHome() {
   list.innerHTML = myProjects.map(p => {
     const total = p.bills.reduce((s, b) => s + b.amount, 0);
     return `<div class="project-item" onclick="navigate('#room/${p.id}')">
-      <div class="emoji">🏕️</div>
+      <div class="emoji">${p.emoji || '🏕️'}</div>
       <div class="info"><h3>${p.name}</h3><p>${p.members.length}人 · ${p.bills.length}笔</p></div>
       <div class="amount">¥${total}</div>
     </div>`;
@@ -819,12 +838,29 @@ function handleJoin() {
   navigate('#room/' + p.id);
 }
 
+var selectedProjectEmoji = '🏕️';
+var PROJECT_EMOJIS = ['🏕️','🎮','🍽️','🏖️','🎂','🏠','🚗','✈️','🎤','🏋️','🎄','❄️','🌸','🎉','🏫','🎬','🌊','⛰️','🍺','☕','📚','🎵','🛒','🎪'];
+
+function initProjectEmoji() {
+  selectedProjectEmoji = '🏕️';
+  var grid = document.getElementById('project-emoji-grid');
+  grid.innerHTML = PROJECT_EMOJIS.map(function(e) {
+    return '<span class="emoji-opt' + (e === '🏕️' ? ' selected' : '') + '" onclick="selectProjectEmoji(this)">' + e + '</span>';
+  }).join('');
+}
+
+function selectProjectEmoji(el) {
+  document.querySelectorAll('#project-emoji-grid .emoji-opt').forEach(function(t) { t.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedProjectEmoji = el.textContent;
+}
+
 function handleCreateProject() {
   const name = document.getElementById('new-name').value.trim();
   const date = document.getElementById('new-date').value;
   if (!name) return showToast('请输入项目名称');
   const code = Math.random().toString(36).substring(2, 6).toLowerCase();
-  const p = { id: 'p' + Date.now(), name, date, code, createdBy: DB.currentUser.id, settled: false, members: [DB.currentUser.id], bills: [], logs: [{ time: formatTime(new Date()), text: DB.currentUser.username + ' 创建了项目「' + name + '」' }] };
+  const p = { id: 'p' + Date.now(), name, emoji: selectedProjectEmoji, date, code, createdBy: DB.currentUser.id, settled: false, members: [DB.currentUser.id], bills: [], logs: [{ time: formatTime(new Date()), text: DB.currentUser.username + ' 创建了项目「' + name + '」' }] };
   DB.projects.push(p);
   saveDB();
   showToast('项目已创建，分享码：' + code);
@@ -842,6 +878,7 @@ function renderRoom() {
   const p = findProject(pid);
   if (!p) return;
   document.getElementById('room-title').textContent = p.name;
+  document.getElementById('room-emoji').textContent = p.emoji || '🏕️';
 
   const total = p.bills.reduce((s, b) => s + b.amount, 0);
   const perPerson = p.members.length > 0 ? (total / p.members.length) : 0;
@@ -914,6 +951,50 @@ function shareRoom() {
   });
 }
 
+function showRenameModal() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <h3>✏️ 重命名项目</h3>
+    <div class="label" style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">项目名称</div>
+    <input class="input" id="rename-input" value="${p.name}" style="margin-bottom:16px;">
+    <div class="label" style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">项目图标</div>
+    <div class="emoji-grid" id="rename-emoji-grid"></div>
+    <button class="btn btn-primary" onclick="saveRename()" style="margin-top:16px;">保存</button>
+  `;
+  var re = p.emoji || '🏕️';
+  var grid = document.getElementById('rename-emoji-grid');
+  grid.innerHTML = PROJECT_EMOJIS.map(function(e) {
+    return '<span class="emoji-opt' + (e === re ? ' selected' : '') + '" onclick="selectRenameEmoji(this)">' + e + '</span>';
+  }).join('');
+  window._renameEmoji = re;
+  overlay.classList.add('show');
+}
+
+function selectRenameEmoji(el) {
+  document.querySelectorAll('#rename-emoji-grid .emoji-opt').forEach(function(t) { t.classList.remove('selected'); });
+  el.classList.add('selected');
+  window._renameEmoji = el.textContent;
+}
+
+function saveRename() {
+  const pid = getCurrentProjectId();
+  const p = findProject(pid);
+  if (!p) return;
+  const newName = document.getElementById('rename-input').value.trim();
+  if (!newName) return showToast('请输入项目名称');
+  p.name = newName;
+  p.emoji = window._renameEmoji || '🏕️';
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 修改了项目名称为「' + newName + '」' });
+  saveDB();
+  document.getElementById('modal-overlay').classList.remove('show');
+  renderRoom();
+  showToast('已保存');
+}
+
 // ============================================
 // Member Info
 // ============================================
@@ -929,7 +1010,7 @@ function showMemberInfo(userId) {
       <div style="width:56px;height:56px;border-radius:50%;background:${u.avatarBg || 'var(--primary-light)'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:${u.avatarBg ? '#333' : 'var(--primary)'};margin:0 auto 8px;">${char}</div>
       <div style="font-size:18px;font-weight:600;">${u.username}</div>
       <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">${u.email || '未设置邮箱'}</div>
-      ${u.zelle ? '<div style="margin-top:10px;padding:8px 12px;background:#f0f8ff;border-radius:8px;font-size:13px;color:#333;">💳 Zelle: ' + u.zelle + '</div>' : ''}
+      ${u.zelle ? '<div style="margin-top:10px;background:#f0f8ff;border-radius:8px;font-size:13px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;"><span style="color:var(--text-secondary);font-weight:600;">💳 ZELLE</span><span style="color:#333;cursor:pointer;" onclick="copyText(\'' + u.zelle.replace(/'/g,"\\'") + '\')">' + u.zelle + '<span style="margin-left:6px;font-size:11px;color:var(--primary);">📋 复制</span></span></div></div>' : ''}
     </div>
     <button class="btn btn-outline" onclick="document.getElementById('modal-overlay').classList.remove('show')" style="margin-top:8px;">关闭</button>
   `;
@@ -1421,14 +1502,51 @@ function renderLogs(pid) {
 // ============================================
 function renderAdmin() {
   if (!DB.currentUser || DB.currentUser.role !== 'admin') {
-    document.getElementById('admin-table').innerHTML = '<p style="text-align:center;color:var(--danger);padding:40px 0;">无权访问</p>';
+    document.getElementById('admin-table').innerHTML = '<p style="text-align:center;color:var(--danger);padding:40px 0;">无权限</p>';
     return;
   }
   document.getElementById('admin-table').innerHTML = DB.users.map(function(u) {
-    return '<div class="row"><div><div class="name">' + u.username + (DB.currentUser.id === u.id ? '（你）' : '') + '</div><div class="email">' + (u.email || '未设邮箱') + '</div></div><span class="role ' + u.role + '">' + (u.role === 'admin' ? '管理员' : '用户') + '</span></div>';
+    return '<div class="row" style="cursor:pointer;" onclick="showAdminUserModal(\u0027' + u.id + '\u0027)"><div><div class="name">' + u.username + (DB.currentUser.id === u.id ? '\uff08\u4f60\uff09' : '') + '</div><div class="email">' + (u.email || '\u672a\u8bbe\u90ae\u7bb1') + '</div></div><span class="role \u0027 + u.role + \u0027>' + (u.role === 'admin' ? '\u7ba1\u7406\u5458' : '\u7528\u6237') + '</span></div>';
   }).join('');
 }
 
+function showAdminUserModal(userId) {
+  var u = findUser(userId);
+  if (!u) return;
+  var overlay = document.getElementById('modal-overlay');
+  var content = document.getElementById('modal-content');
+  var ch = u.avatar || u.username.charAt(0);
+  var bg = u.avatarBg || '#e0f7fa';
+  content.innerHTML =
+    '<h3>' + '\ud83d\udc64' + ' ' + u.username + ' \u8d26\u53f7\u4fe1\u606f</h3>' +
+    '<div style="text-align:center;padding:8px 0;">' +
+      '<div style="width:48px;height:48px;border-radius:50%;background:' + bg + ';display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#333;margin:0 auto 8px;">' + ch + '</div>' +
+    '</div>' +
+    '<div class="card" style="margin-bottom:12px;">' +
+      '<div style="margin-bottom:8px;"><span style="color:var(--text-secondary);font-size:13px;">\u90ae\u7bb1</span><br>' + (u.email || '\u672a\u8bbe\u7f6e') + '</div>' +
+      '<div style="margin-bottom:8px;"><span style="color:var(--text-secondary);font-size:13px;">\u89d2\u8272</span><br>' + (u.role === 'admin' ? '\u7ba1\u7406\u5458' : '\u7528\u6237') + '</div>' +
+      '<div><span style="color:var(--text-secondary);font-size:13px;">\u5bc6\u7801</span><br><span style="font-family:monospace;font-size:15px;font-weight:600;">' + u.password + '</span></div>' +
+    '</div>' +
+    '<div class="label" style="font-size:13px;color:var(--text-secondary);">\u4fee\u6539\u5bc6\u7801</div>' +
+    '<input class="input" id="admin-new-pass" type="password" placeholder="\u8f93\u5165\u65b0\u5bc6\u7801" style="margin-bottom:12px;">' +
+    '<input class="input" id="admin-new-pass2" type="password" placeholder="\u786e\u8ba4\u65b0\u5bc6\u7801" style="margin-bottom:16px;">' +
+    '<button class="btn btn-primary" onclick="saveAdminPassword(\u0027' + u.id + '\u0027)">\u4fdd\u5b58\u5bc6\u7801</button>';
+  overlay.classList.add('show');
+}
+
+function saveAdminPassword(userId) {
+  var u = findUser(userId);
+  if (!u) return;
+  var pass = document.getElementById('admin-new-pass').value.trim();
+  var pass2 = document.getElementById('admin-new-pass2').value.trim();
+  if (!pass) return showToast('\u8bf7\u8f93\u5165\u65b0\u5bc6\u7801');
+  if (pass !== pass2) return showToast('\u4e24\u6b21\u5bc6\u7801\u4e0d\u4e00\u81f4');
+  u.password = pass;
+  saveDB();
+  document.getElementById('modal-overlay').classList.remove('show');
+  renderAdmin();
+  showToast('\u5bc6\u7801\u5df2\u66f4\u65b0');
+}
 // ============================================
 // Account & Avatar
 // ============================================
@@ -1488,6 +1606,14 @@ function selectAvatar(char, bg, color) {
 // ============================================
 // Utils
 // ============================================
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('已复制到剪贴板');
+  }).catch(function() {
+    showToast('复制失败，请手动复制');
+  });
+}
+
 function formatTime(d) {
   var pad = function(n) { return String(n).padStart(2,'0'); };
   return pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());

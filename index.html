@@ -464,6 +464,9 @@ body {
     <div id="room-category-summary" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;"></div>
     <div class="members" id="room-members"></div>
   </div>
+  <div onclick="navigate('#logs')" style="padding:3px 20px 8px;font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:4px;cursor:pointer;">
+    📋 操作记录 <span style="font-size:10px;">→</span>
+  </div>
   <div id="bill-list" style="padding:0 16px 80px;"></div>
 </div>
 
@@ -529,6 +532,7 @@ body {
   <div class="header">
     <button class="back" onclick="navigateToRoom()">←</button>
     <h1>账单详情</h1>
+    <button id="bill-edit-btn" style="border:none;background:none;font-size:14px;color:var(--primary);font-weight:600;display:none;" onclick="toggleBillEdit()">编辑</button>
     <button style="border:none;background:none;font-size:14px;color:var(--danger);font-weight:600;" onclick="deleteBill()">删除</button>
   </div>
   <div id="bill-detail-content" style="padding:20px;"></div>
@@ -722,7 +726,7 @@ function renderRoute() {
   else if (hash.startsWith('#bill/') && hash.includes('/add')) { document.getElementById('page-add-bill').classList.add('active'); initAddBill(); }
   else if (hash.startsWith('#bill/') && hash.includes('/detail/')) { document.getElementById('page-bill-detail').classList.add('active'); renderBillDetail(); }
   else if (hash.startsWith('#settle')) { document.getElementById('page-settle').classList.add('active'); renderSettle(); }
-  else if (hash === '#logs') { document.getElementById('page-logs').classList.add('active'); renderLogs(getCurrentProjectId()); }
+  else if (hash === '#logs') { document.getElementById('page-logs').classList.add('active'); renderLogs(getCurrentProjectId() || window._currentPid); }
   else if (hash === '#admin') { document.getElementById('page-admin').classList.add('active'); renderAdmin(); }
   else if (hash === '#account') { document.getElementById('page-account').classList.add('active'); renderAccount(); }
 }
@@ -878,6 +882,7 @@ function renderRoom() {
   const pid = getCurrentProjectId();
   const p = findProject(pid);
   if (!p) return;
+  window._currentPid = pid;
   document.getElementById('room-title').textContent = p.name;
   document.getElementById('room-emoji').textContent = p.emoji || '🏕️';
 
@@ -1119,8 +1124,8 @@ function navigateToAddBill() {
 }
 
 function navigateToRoom() {
-  const pid = getCurrentProjectId();
-  navigate('#room/' + pid);
+  const pid = getCurrentProjectId() || window._currentPid;
+  if (pid) navigate('#room/' + pid);
 }
 
 function initAddBill() {
@@ -1302,6 +1307,8 @@ function saveBill() {
 // Bill Detail
 // ============================================
 function renderBillDetail() {
+  window._billEditMode = false;
+  document.getElementById('bill-edit-btn').textContent = '编辑';
   const hash = window.location.hash;
   const m = hash.match(/bill\/([^/]+)\/detail\/([^/]+)/);
   if (!m) return;
@@ -1311,6 +1318,13 @@ function renderBillDetail() {
   const bill = p.bills.find(function(b) { return b.id === bid; });
   if (!bill) return;
 
+  // 显示编辑按钮（仅创建者可见）
+  document.getElementById('bill-edit-btn').style.display = (bill.createdBy === DB.currentUser.id) ? '' : 'none';
+
+  renderBillDetailContent(bill, p);
+}
+
+function renderBillDetailContent(bill, p) {
   const payers = bill.payers || [bill.payer];
   const tagEmoji = { '餐饮':'🍜', '交通':'🚗', '住宿':'🏨', '门票':'🎫', '购物':'🛍️', '其他':'📦' };
 
@@ -1340,6 +1354,87 @@ function renderBillDetail() {
       <div style="margin-bottom:8px;"><span style="color:var(--text-secondary);font-size:13px;">备注</span><br><span>${bill.note || '无'}</span></div>
       ${bill.createdAt ? '<div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">记录于 ' + bill.createdAt + '</div>' : ''}
     </div>`;
+}
+
+function toggleBillEdit() {
+  window._billEditMode = !window._billEditMode;
+  const hash = window.location.hash;
+  const m = hash.match(/bill\/([^/]+)\/detail\/([^/]+)/);
+  if (!m) return;
+  const pid = m[1], bid = m[2];
+  const p = findProject(pid);
+  if (!p) return;
+  const bill = p.bills.find(function(b) { return b.id === bid; });
+  if (!bill) return;
+
+  if (window._billEditMode) {
+    document.getElementById('bill-edit-btn').textContent = '取消';
+    // 编辑模式：渲染可编辑表单
+    var tagOptions = ['餐饮','交通','住宿','门票','购物','其他'];
+    var tagEmoji = { '餐饮':'🍜', '交通':'🚗', '住宿':'🏨', '门票':'🎫', '购物':'🛍️', '其他':'📦' };
+    var tagHtml = tagOptions.map(function(t) {
+      return '<span class="tag' + (t === bill.tag ? ' selected' : '') + '" onclick="selectEditTag(this,\'' + t + '\')">' + (tagEmoji[t]||'') + ' ' + t + '</span>';
+    }).join('');
+    document.getElementById('bill-detail-content').innerHTML =
+      '<div class="label">金额</div>' +
+      '<div style="font-size:32px;font-weight:800;text-align:center;margin-bottom:16px;cursor:pointer;" onclick="showEditNumpad()">¥<span id="edit-amount-display">' + bill.amount + '</span></div>' +
+      '<div id="edit-numpad-area"></div>' +
+      '<div class="label">标签</div>' +
+      '<div class="tag-grid" style="margin-bottom:16px;">' + tagHtml + '</div>' +
+      '<div class="label">备注</div>' +
+      '<input class="input" id="edit-note" value="' + (bill.note || '') + '" style="margin-bottom:16px;">' +
+      '<div style="display:flex;gap:8px;">' +
+      '  <button class="btn btn-primary" onclick="saveBillEdit()">保存修改</button>' +
+      '</div>';
+    window._editingBillAmount = bill.amount;
+    window._editingBillTag = bill.tag;
+  } else {
+    document.getElementById('bill-edit-btn').textContent = '编辑';
+    renderBillDetailContent(bill, p);
+  }
+}
+
+function selectEditTag(el, tag) {
+  document.querySelectorAll('#bill-detail-content .tag').forEach(function(t) { t.classList.remove('selected'); });
+  el.classList.add('selected');
+  window._editingBillTag = tag;
+}
+
+function showEditNumpad() {
+  // 简洁的数字编辑：直接 prompt 输入
+  var v = prompt('输入新金额（数字）', window._editingBillAmount || '');
+  if (v !== null && !isNaN(parseFloat(v)) && parseFloat(v) > 0) {
+    var amt = parseFloat(v);
+    window._editingBillAmount = amt;
+    document.getElementById('edit-amount-display').textContent = amt;
+  }
+}
+
+function saveBillEdit() {
+  const hash = window.location.hash;
+  const m = hash.match(/bill\/([^/]+)\/detail\/([^/]+)/);
+  if (!m) return;
+  const pid = m[1], bid = m[2];
+  const p = findProject(pid);
+  if (!p) return;
+  const bill = p.bills.find(function(b) { return b.id === bid; });
+  if (!bill) return;
+
+  var newAmount = window._editingBillAmount;
+  var newTag = window._editingBillTag || bill.tag;
+  var newNote = document.getElementById('edit-note').value.trim() || bill.tag;
+
+  if (!newAmount || newAmount <= 0) return showToast('请输入有效金额');
+
+  bill.amount = newAmount;
+  bill.tag = newTag;
+  bill.note = newNote;
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 修改了账单「' + bill.note + ' ¥' + newAmount + '」' });
+  saveDB();
+  showToast('已保存');
+  window._billEditMode = false;
+  document.getElementById('bill-edit-btn').textContent = '编辑';
+  renderBillDetailContent(bill, p);
 }
 
 function deleteBill() {

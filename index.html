@@ -773,6 +773,10 @@ function renderRoute() {
     }
   }
 
+  // 隐藏数字键盘
+  var npad = document.getElementById('numpad');
+  if (npad) npad.style.display = 'none';
+
   if (hash.startsWith('#login') || hash.startsWith('#register') || hash.startsWith('#forgot')) {
     document.getElementById('page-login').classList.add('active');
     if (hash === '#register') showRegister();

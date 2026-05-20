@@ -648,6 +648,20 @@ async function loadDB() {
             _total: p.total, _memberCount: p.memberCount, _billCount: p.billCount,
           }));
         }
+        // 合并localStorage旧项目（Worker修复前创建的本地项目）
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const saved = JSON.parse(raw);
+            if (saved.projects) {
+              for (const lp of saved.projects) {
+                if (!DB.projects.find(p => p.id === lp.id)) {
+                  DB.projects.push(lp);
+                }
+              }
+            }
+          }
+        } catch(e) { console.warn('merge local projects error:', e); }
         return;
       }
     } catch(e) { console.warn('API load failed', e); }
@@ -980,10 +994,11 @@ async function handleJoin() {
         navigate('#room/' + res.project.id);
         return;
       }
-      if (res.error) { showToast(res.error); return; }
+      // Worker找不到时,继续到localStorage fallback（旧项目可能在本地）
+      if (res.error && res.error !== '未找到该分享码') { showToast(res.error); return; }
     } catch(e) {}
   }
-  // fallback
+  // fallback: localStorage
   const p = DB.projects.find(pr => pr.code === code);
   if (!p) return showToast('未找到该分享码');
   if (p.members.includes(DB.currentUser.id)) return showToast('你已在项目中');

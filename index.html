@@ -686,13 +686,7 @@ async function loadDB() {
 }
 
 function saveDB() {
-  // API模式不需要保存到localStorage（数据在服务器）
-  // 仅保留token
-  if (API_TOKEN) {
-    localStorage.setItem('aa_token', API_TOKEN);
-    return;
-  }
-  // fallback
+  // 始终保存到localStorage（API模式下也存一份，用于fallback和离线）
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       users: DB.users,
@@ -700,6 +694,10 @@ function saveDB() {
       currentUserId: DB.currentUser ? DB.currentUser.id : null
     }));
   } catch(e) { console.warn('saveDB error:', e); }
+  // API模式额外保留token
+  if (API_TOKEN) {
+    localStorage.setItem('aa_token', API_TOKEN);
+  }
 }
 
 // ============================================

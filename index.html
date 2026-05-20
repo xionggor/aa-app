@@ -419,7 +419,7 @@ body {
     <div style="width:40px;height:40px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary);font-weight:600;" id="home-avatar">G</div>
   </div>
   <div class="join-section">
-    <input class="input" id="join-code" placeholder="输入分享码加入" style="text-transform:uppercase;">
+    <input class="input" id="join-code" placeholder="输入分享码加入" style="text-transform:lowercase;letter-spacing:2px;">
     <button class="btn btn-primary" onclick="handleJoin()">加入</button>
   </div>
   <div class="project-list" id="project-list"></div>
@@ -457,10 +457,10 @@ body {
       <button class="settle-btn" onclick="navigateToSettle()">全员结算 →</button>
     </div>
     <div class="amount-row">
-      <span class="currency">¥</span>
+      <span class="currency">$</span>
       <span class="total" id="room-total">0</span>
     </div>
-    <div class="per-person" id="room-perperson">人均 ¥0</div>
+    <div class="per-person" id="room-perperson">人均 $0</div>
     <div id="room-category-summary" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;"></div>
     <div class="members" id="room-members"></div>
   </div>
@@ -481,7 +481,7 @@ body {
     <div class="amount-hint" onclick="if(document.getElementById('bill-step-amount').style.display!='none')showNumpad()">点击输入支出金额</div>
   </div>
   <div id="bill-step-detail" class="bill-form" style="display:none;">
-    <div style="font-size:24px;font-weight:800;text-align:center;margin-bottom:16px;">¥<span id="bill-amount-display">0</span></div>
+    <div style="font-size:24px;font-weight:800;text-align:center;margin-bottom:16px;">$<span id="bill-amount-display">0</span></div>
     <div class="label">标签</div>
     <div class="tag-grid" id="bill-tags">
       <span class="tag selected" data-tag="餐饮" onclick="selectTag(this)">🍜 餐饮</span>
@@ -514,12 +514,18 @@ body {
   </div>
   <div class="settle-summary">
     <div style="font-size:13px;opacity:.8;">总支出</div>
-    <div class="total" id="settle-total">¥0</div>
-    <div class="per-person" id="settle-perperson">人均 ¥0</div>
+    <div class="total" id="settle-total">$0</div>
+    <div class="per-person" id="settle-perperson">人均 $0</div>
   </div>
   <div class="settle-detail" id="settle-detail"></div>
   <div style="padding:0 20px;"><div class="label">💡 最少转账方案</div></div>
   <div class="transfer-list" id="transfer-list"></div>
+  <div id="settle-rate-section" style="padding:0 20px 12px;text-align:center;display:none;">
+    <div style="display:inline-block;padding:8px 16px;background:#f0f8ff;border-radius:8px;font-size:13px;color:var(--text-secondary);">
+      约 ¥<span id="settle-cny-amount">0</span>
+      <span style="margin-left:4px;font-size:11px;">(汇率 1 USD = <span id="settle-rate-value">—</span> CNY)</span>
+    </div>
+  </div>
   <div style="padding:16px 20px;">
     <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
       <input type="checkbox" id="settle-done-check" onchange="toggleSettleDone()"> 标记为已结算
@@ -703,7 +709,7 @@ const DB = {
       logs: [
         { time: '05-18 20:30', text: 'GG 创建了项目' },
         { time: '05-18 20:30', text: '小王 加入了项目' },
-        { time: '05-18 20:31', text: 'GG 添加了账单「火锅 ¥300」' },
+        { time: '05-18 20:31', text: 'GG 添加了账单「火锅 $300」' },
       ]
     }
   ]
@@ -932,7 +938,7 @@ async function renderHome() {
           return `<div class="project-item" onclick="navigate('#room/${p.id}')">
             <div class="emoji">${emoji}</div>
             <div class="info"><h3>${p.name}${settledBadge}</h3><p>${p.memberCount}人 · ${p.billCount}笔</p></div>
-            <div class="amount">¥${p.total}</div>
+            <div class="amount">$${p.total}</div>
           </div>`;
         }).join('');
         if (myProjects.length === 0) {
@@ -957,7 +963,7 @@ async function renderHome() {
     return `<div class="project-item" onclick="navigate('#room/${p.id}')">
       <div class="emoji">${p.emoji || '🏕️'}</div>
       <div class="info"><h3>${p.name}${settledBadge}</h3><p>${p.members ? p.members.length : p._memberCount || 0}人 · ${p.bills ? p.bills.length : p._billCount || 0}笔</p></div>
-      <div class="amount">¥${total}</div>
+      <div class="amount">$${total}</div>
     </div>`;
   }).join('');
 }
@@ -1062,13 +1068,13 @@ async function renderRoom() {
   const total = p.bills ? p.bills.reduce((s, b) => s + b.amount, 0) : 0;
   const members = p.members || [];
   const perPerson = members.length > 0 ? (total / members.length) : 0;
-  document.getElementById('room-total').textContent = '¥' + total;
-  document.getElementById('room-perperson').textContent = '人均 ¥' + perPerson.toFixed(1);
+  document.getElementById('room-total').textContent = '$' + total;
+  document.getElementById('room-perperson').textContent = '人均 $' + perPerson.toFixed(1);
 
-  // 成员头像（可点击）
+  // 成员头像（可点击）— 未知成员显示占位符
   const memberInfos = p.memberInfos || p.members.map(id => {
     const u = findUser(id);
-    return u ? { id, username: u.username, avatar: u.avatar, avatarBg: u.avatarBg } : null;
+    return u ? { id, username: u.username, avatar: u.avatar, avatarBg: u.avatarBg } : { id, username: id.slice(0, 2), avatar: id.charAt(0).toUpperCase(), avatarBg: '#e0e0e0' };
   }).filter(Boolean);
   
   document.getElementById('room-members').innerHTML = (memberInfos || []).map(m => {
@@ -1082,7 +1088,7 @@ async function renderRoom() {
   const catSum = document.getElementById('room-category-summary');
   if (Object.keys(cats).length > 0) {
     catSum.innerHTML = Object.entries(cats).map(([tag, amt]) =>
-      `<span class="badge" style="background:rgba(255,255,255,.15);color:#fff;">${catEmojis[tag]||'📦'} ${tag} ¥${amt}</span>`
+      `<span class="badge" style="background:rgba(255,255,255,.15);color:#fff;">${catEmojis[tag]||'📦'} ${tag} $${amt}</span>`
     ).join('');
     if (p.settled) catSum.innerHTML += '<span class="badge" style="background:#e8f8e8;color:#34c759;margin-left:6px;">✅ 已结算</span>';
   } else {
@@ -1104,11 +1110,12 @@ async function renderRoom() {
     const payerNames = payers.map(id => { const u = findUser(id) || (memberInfos || []).find(m => m.id === id); return u ? (u.avatar || u.username.charAt(0)) : '?'; }).join('+');
     const iconCls = catIconCls[b.tag] || 'other';
     const isMine = payers.includes(myId);
+    var splitCount = b.splitAll ? members.length : (b.split ? b.split.length : 0);
     return `<div class="bill-item" onclick="navigate('#bill/${pid}/detail/${b.id}')" style="${isMine ? 'border-left:3px solid var(--primary);' : ''}">
       <div class="type-icon ${iconCls}">${catEmojis[b.tag]||'📦'}</div>
       <div class="info">
-        <div class="top"><span class="name">${b.note || b.tag}</span><span class="cost">¥${b.amount}</span></div>
-        <div class="meta">${payerNames} 付 · ${b.split.length}人分摊 · ${b.createdAt || ''}</div>
+        <div class="top"><span class="name">${b.note || b.tag}</span><span class="cost">$${b.amount}</span></div>
+        <div class="meta">${payerNames} 付 · ${splitCount}人分摊 · ${b.createdAt || ''}</div>
       </div>
     </div>`;
   }
@@ -1133,7 +1140,7 @@ async function renderRoom() {
     // P5: 副标题格式优化
     const displayDate = dateKey.length === 5 ? '2026-' + dateKey.replace('-', '-') : dateKey;
     html += `<div class="bill-section">
-      <div class="bill-section-title">${displayDate}  <span style="font-weight:400;font-size:11px;color:#999;">小计 ¥${dayTotal}</span></div>
+      <div class="bill-section-title">${displayDate}  <span style="font-weight:400;font-size:11px;color:#999;">小计 $${dayTotal}</span></div>
       ${bills.map(renderBillItem).join('')}
     </div>`;
   });
@@ -1255,12 +1262,22 @@ async function showMemberInfo(userId) {
     memberInfo = p.memberInfos.find(m => m.id === userId);
   }
   
+  // 如果本地找不到用户，尝试从API获取
+  if (!u && !memberInfo && API_TOKEN) {
+    try {
+      const remoteUser = await api('/api/user/' + userId);
+      if (remoteUser && remoteUser.id) {
+        DB.users.push({ id: remoteUser.id, username: remoteUser.username, avatar: remoteUser.avatar, avatarBg: remoteUser.avatarBg });
+        u = remoteUser;
+      }
+    } catch(e) {}
+  }
+
   const username = (memberInfo && memberInfo.username) || (u ? u.username : userId);
   const avatarChar = (memberInfo && memberInfo.avatar) || (u ? u.avatar : '?');
   const avatarBg = (memberInfo && memberInfo.avatarBg) || (u ? u.avatarBg : 'var(--primary-light)');
   const zelle = (memberInfo && memberInfo.zelle) || (u ? u.zelle : '');
-  const hasCode = (memberInfo && memberInfo.hasPaymentCode) || false;
-  
+
   const overlay = document.getElementById('modal-overlay');
   const content = document.getElementById('modal-content');
   
@@ -1269,8 +1286,8 @@ async function showMemberInfo(userId) {
     codeHtml += '<div style="margin-top:10px;background:#f0f8ff;border-radius:8px;font-size:13px;"><div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;"><span style="color:var(--text-secondary);font-weight:600;">💳 ZELLE</span><span style="color:#333;cursor:pointer;" onclick="copyText(' + zelle.replace(/'/g,"\'") + ')">' + zelle + '<span style="margin-left:6px;font-size:11px;color:var(--primary);">📋 复制</span></span></div></div>';
   }
   
-  // 尝试加载收款码
-  if (hasCode && API_TOKEN) {
+  // 直接尝试加载收款码（不依赖 hasCode 标记）
+  if (API_TOKEN) {
     try {
       const res = await api('/api/user/' + userId + '/payment-code');
       if (res.imageBase64) {
@@ -1572,8 +1589,10 @@ async function saveBill() {
   var split;
   if (document.getElementById('bill-split-all').checked) {
     split = (p.members || []).slice();
+    billDraft.splitAll = true;
   } else {
     split = billDraft.customSplit || (p.members || []).slice();
+    billDraft.splitAll = false;
   }
 
   if (!split || split.length === 0) {
@@ -1604,7 +1623,7 @@ async function saveBill() {
   p.bills = p.bills || [];
   p.bills.push(bill);
   p.logs = p.logs || [];
-  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 添加了账单「' + note + ' ¥' + amount + '」' });
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 添加了账单「' + note + ' $' + amount + '」' });
   saveDB();
   showToast('已保存');
 }
@@ -1612,14 +1631,26 @@ async function saveBill() {
 // ============================================
 // Bill Detail
 // ============================================
-function renderBillDetail() {
+async function renderBillDetail() {
   window._billEditMode = false;
   document.getElementById('bill-edit-btn').textContent = '编辑';
   const hash = window.location.hash;
   const m = hash.match(/bill\/([^/]+)\/detail\/([^/]+)/);
   if (!m) return;
   const pid = m[1], bid = m[2];
-  const p = findProject(pid);
+  let p = findProject(pid);
+
+  // 缓存为空时从API加载
+  if (!p && API_TOKEN) {
+    try {
+      const detail = await api('/api/projects/' + pid);
+      if (detail && detail.id) {
+        _cachedProjects[pid] = detail;
+        p = detail;
+      }
+    } catch(e) {}
+  }
+
   if (!p) return;
   const bill = p.bills.find(function(b) { return b.id === bid; });
   if (!bill) return;
@@ -1643,7 +1674,8 @@ function renderBillDetailContent(bill, p) {
   payerHtml += '</div>';
 
   var splitHtml = '<div style="display:flex;gap:6px;margin-top:4px;">';
-  bill.split.forEach(function(id) {
+  var displaySplit = bill.splitAll ? (p.members || []) : (bill.split || []);
+  displaySplit.forEach(function(id) {
     const u = findUser(id);
     const char = u ? (u.avatar || u.username.charAt(0)) : '?';
     splitHtml += '<span class="avatar" style="width:28px;height:28px;font-size:11px;display:flex;align-items:center;justify-content:center;background:#f0f0f5;color:#666;border:1px solid #ddd;cursor:pointer;" onclick="showMemberInfo(\'' + id + '\')">' + char + '</span>';
@@ -1652,7 +1684,7 @@ function renderBillDetailContent(bill, p) {
 
   document.getElementById('bill-detail-content').innerHTML = `
     <div style="text-align:center;font-size:48px;margin-bottom:4px;">${tagEmoji[bill.tag]||'📦'}</div>
-    <div style="text-align:center;font-size:36px;font-weight:800;margin-bottom:24px;">¥${bill.amount}</div>
+    <div style="text-align:center;font-size:36px;font-weight:800;margin-bottom:24px;">$${bill.amount}</div>
     <div class="card">
       <div style="margin-bottom:12px;"><span style="color:var(--text-secondary);font-size:13px;">标签</span><br><span style="font-weight:500;">${bill.tag}</span></div>
       <div style="margin-bottom:12px;"><span style="color:var(--text-secondary);font-size:13px;">支付人</span><br>${payerHtml}</div>
@@ -1683,7 +1715,7 @@ function toggleBillEdit() {
     }).join('');
     document.getElementById('bill-detail-content').innerHTML =
       '<div class="label">金额</div>' +
-      '<div style="font-size:32px;font-weight:800;text-align:center;margin-bottom:16px;cursor:pointer;" onclick="showEditNumpad()">¥<span id="edit-amount-display">' + bill.amount + '</span></div>' +
+      '<div style="font-size:32px;font-weight:800;text-align:center;margin-bottom:16px;cursor:pointer;" onclick="showEditNumpad()">$<span id="edit-amount-display">' + bill.amount + '</span></div>' +
       '<div id="edit-numpad-area"></div>' +
       '<div class="label">标签</div>' +
       '<div class="tag-grid" style="margin-bottom:16px;">' + tagHtml + '</div>' +
@@ -1700,7 +1732,7 @@ function toggleBillEdit() {
     window._editingBillTag = bill.tag;
     window._editBillDraft = {
       payers: bill.payers || [bill.payer],
-      split: bill.split.slice()
+      split: bill.splitAll ? (p.members || []).slice() : (bill.split || []).slice()
     };
     // 渲染支付人和分摊人
     editRenderPayerRow(document.getElementById('edit-payer-row'), p, window._editBillDraft.payers);
@@ -1843,9 +1875,9 @@ async function saveBillEdit() {
   bill.tag = newTag;
   bill.note = newNote;
   if (newPayers) { bill.payers = newPayers; bill.payer = newPayers[0]; }
-  if (newSplit) bill.split = newSplit;
+  if (newSplit) { bill.split = newSplit; bill.splitAll = false; }
   p.logs = p.logs || [];
-  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 修改了账单「' + bill.note + ' ¥' + newAmount + '」' });
+  p.logs.push({ time: formatTime(new Date()), text: DB.currentUser.username + ' 修改了账单「' + bill.note + ' $' + newAmount + '」' });
   saveDB();
   showToast('已保存');
   window._billEditMode = false;
@@ -1903,7 +1935,7 @@ async function renderSettle() {
   if (!p) p = findProject(pid);
   
   if (!p || !p.bills || p.bills.length === 0) {
-    document.getElementById('settle-total').textContent = '¥0';
+    document.getElementById('settle-total').textContent = '$0';
     document.getElementById('settle-perperson').textContent = '暂无账单';
     document.getElementById('settle-detail').innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px 0;">还没有账单</p>';
     document.getElementById('transfer-list').innerHTML = '';
@@ -1913,16 +1945,17 @@ async function renderSettle() {
   const members = p.members || [];
   const total = p.bills.reduce(function(s, b) { return s + b.amount; }, 0);
   const perPerson = members.length > 0 ? total / members.length : 0;
-  document.getElementById('settle-total').textContent = '¥' + total;
-  document.getElementById('settle-perperson').textContent = '人均 ¥' + perPerson.toFixed(1);
+  document.getElementById('settle-total').textContent = '$' + total;
+  document.getElementById('settle-perperson').textContent = '人均 $' + perPerson.toFixed(1);
   document.getElementById('settle-done-check').checked = p.settled;
 
   const stats = {};
   members.forEach(function(id) { stats[id] = { paid: 0, share: 0 }; });
   p.bills.forEach(function(b) {
     if (stats[b.payer]) stats[b.payer].paid += b.amount;
-    const perShare = b.amount / (b.split.length || 1);
-    b.split.forEach(function(id) { if (stats[id]) stats[id].share += perShare; });
+    var splitMembers = b.splitAll ? (p.members || []) : (b.split || []);
+    const perShare = b.amount / (splitMembers.length || 1);
+    splitMembers.forEach(function(id) { if (stats[id]) stats[id].share += perShare; });
   });
 
   document.getElementById('settle-detail').innerHTML = members.map(function(id) {
@@ -1932,7 +1965,7 @@ async function renderSettle() {
     const name = u ? u.username : id;
     const balance = s.paid - s.share;
     const isGet = balance > 0;
-    return '<div class="person-card"><div class="header"><span class="name">' + name + (id === p.createdBy ? ' 👑' : '') + '</span><span class="status ' + (isGet ? 'get' : 'pay') + '">' + (isGet ? '💰 应收 ¥' + balance.toFixed(1) : '💸 应付 ¥' + Math.abs(balance).toFixed(1)) + '</span></div><div class="details">付了 ¥' + s.paid.toFixed(1) + ' · 应摊 ¥' + s.share.toFixed(1) + '</div></div>';
+    return '<div class="person-card"><div class="header"><span class="name">' + name + (id === p.createdBy ? ' 👑' : '') + '</span><span class="status ' + (isGet ? 'get' : 'pay') + '">' + (isGet ? '💰 应收 $' + balance.toFixed(1) : '💸 应付 $' + Math.abs(balance).toFixed(1)) + '</span></div><div class="details">付了 $' + s.paid.toFixed(1) + ' · 应摊 $' + s.share.toFixed(1) + '</div></div>';
   }).join('');
 
   const transfers = calculateTransfers(members.map(function(id) {
@@ -1945,9 +1978,33 @@ async function renderSettle() {
     transferDiv.innerHTML = transfers.map(function(t) {
       const from = findUser(t.from) || (p.memberInfos || []).find(m => m.id === t.from);
       const to = findUser(t.to) || (p.memberInfos || []).find(m => m.id === t.to);
-      return '<div class="transfer-item"><span class="from">' + (from ? from.username : '?') + '</span><span class="arrow">→</span><span class="to">' + (to ? to.username : '?') + '</span><span class="amount">¥' + t.amount.toFixed(1) + '</span></div>';
+      return '<div class="transfer-item"><span class="from">' + (from ? from.username : '?') + '</span><span class="arrow">→</span><span class="to">' + (to ? to.username : '?') + '</span><span class="amount">$' + t.amount.toFixed(1) + '</span></div>';
     }).join('');
   }
+
+  // 获取实时汇率并显示CNY等价
+  if (window._cnyRate) {
+    updateCnyDisplay(total, window._cnyRate);
+  } else {
+    fetch('https://open.er-api.com/v6/latest/USD')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var rate = data && data.rates && data.rates.CNY;
+        if (rate) {
+          window._cnyRate = rate;
+          updateCnyDisplay(total, rate);
+        }
+      })
+      .catch(function() {});
+  }
+}
+
+function updateCnyDisplay(usdTotal, rate) {
+  var section = document.getElementById('settle-rate-section');
+  if (!section) return;
+  section.style.display = '';
+  document.getElementById('settle-cny-amount').textContent = (usdTotal * rate).toFixed(1);
+  document.getElementById('settle-rate-value').textContent = rate.toFixed(2);
 }
 
 function calculateTransfers(balances) {
@@ -1990,14 +2047,15 @@ function copySettleText() {
   if (!p) return;
   const total = p.bills.reduce(function(s, b) { return s + b.amount; }, 0);
   const perPerson = total / p.members.length;
-  var text = '📊 ' + p.name + ' 结算结果\n总支出：¥' + total + ' | 人均：¥' + perPerson.toFixed(1) + '\n\n';
+  var text = '📊 ' + p.name + ' 结算结果\n总支出：$' + total + ' | 人均：$' + perPerson.toFixed(1) + '\n\n';
 
   const stats = {};
   p.members.forEach(function(id) { stats[id] = { paid: 0, share: 0 }; });
   p.bills.forEach(function(b) {
     if (stats[b.payer]) stats[b.payer].paid += b.amount;
-    const perShare = b.amount / b.split.length;
-    b.split.forEach(function(id) { if (stats[id]) stats[id].share += perShare; });
+    var splitMembers = b.splitAll ? (p.members || []) : (b.split || []);
+    const perShare = b.amount / (splitMembers.length || 1);
+    splitMembers.forEach(function(id) { if (stats[id]) stats[id].share += perShare; });
   });
 
   p.members.forEach(function(id) {
@@ -2005,7 +2063,7 @@ function copySettleText() {
     const s = stats[id];
     if (!u || !s) return;
     const balance = s.paid - s.share;
-    text += u.username + '：付了¥' + s.paid.toFixed(1) + '，应摊¥' + s.share.toFixed(1) + '，' + (balance >= 0 ? '应收' : '应付') + '¥' + Math.abs(balance).toFixed(1) + '\n';
+    text += u.username + '：付了$' + s.paid.toFixed(1) + '，应摊$' + s.share.toFixed(1) + '，' + (balance >= 0 ? '应收' : '应付') + '$' + Math.abs(balance).toFixed(1) + '\n';
   });
 
   text += '\n💡 转账方案：\n';
@@ -2015,7 +2073,7 @@ function copySettleText() {
   transfers.forEach(function(t) {
     const from = findUser(t.from);
     const to = findUser(t.to);
-    text += (from ? from.username : '?') + ' → ' + (to ? to.username : '?') + '：¥' + t.amount.toFixed(1) + '\n';
+    text += (from ? from.username : '?') + ' → ' + (to ? to.username : '?') + '：$' + t.amount.toFixed(1) + '\n';
   });
 
   navigator.clipboard.writeText(text).then(function() { showToast('结算结果已复制'); }).catch(function() { showToast('复制失败'); });
@@ -2145,6 +2203,8 @@ async function saveAccount() {
 function showAvatarPicker() {
   const u = DB.currentUser;
   if (!u) return;
+  const overlay = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
   var html = '<h3>选择头像</h3><div class="avatar-grid">';
   AVATAR_OPTIONS.forEach(function(opt) {
     var selected = (u.avatar === opt.char && u.avatarBg === opt.bg) ? ' selected' : '';

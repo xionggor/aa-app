@@ -633,7 +633,6 @@ async function loadDB() {
       if (userData && userData.id) {
         DB.currentUser = { ...userData, password: '' };
         _cachedCurrentUser = DB.currentUser;
-        // 加载项目列表
         const projects = await api('/api/projects');
         if (Array.isArray(projects)) {
           DB.projects = projects.map(p => ({
@@ -645,9 +644,13 @@ async function loadDB() {
         }
         return;
       }
-    } catch(e) { console.warn('API load failed, use local', e); }
+    } catch(e) { console.warn('API load failed', e); }
+    // Token无效 → 清除token, 不降级到localStorage
+    API_TOKEN = null;
+    localStorage.removeItem('aa_token');
+    return;
   }
-  // fallback: localStorage
+  // fallback: localStorage (仅当无token时)
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {

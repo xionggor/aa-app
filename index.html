@@ -477,8 +477,8 @@ body {
     <h1>记一笔</h1>
   </div>
   <div id="bill-step-amount" class="bill-form">
-    <div class="amount-input" id="bill-amount-display-main">0</div>
-    <div class="amount-hint">输入支出金额</div>
+    <div class="amount-input" id="bill-amount-display-main" onclick="if(document.getElementById('bill-step-amount').style.display!='none')showNumpad()">0</div>
+    <div class="amount-hint" onclick="if(document.getElementById('bill-step-amount').style.display!='none')showNumpad()">点击输入支出金额</div>
   </div>
   <div id="bill-step-detail" class="bill-form" style="display:none;">
     <div style="font-size:24px;font-weight:800;text-align:center;margin-bottom:16px;">¥<span id="bill-amount-display">0</span></div>
@@ -802,7 +802,7 @@ function getCurrentProjectId() {
   const m = hash.match(/room\/([^/]+)/) || hash.match(/bill\/([^/]+)/) || hash.match(/settle\/([^/]+)/);
   return m ? m[1] : null;
 }
-function findProject(id) { return DB.projects.find(p => p.id === id); }
+function findProject(id) { return DB.projects.find(p => p.id === id) || _cachedProjects[id]; }
 function findUser(id) { return DB.users.find(u => u.id === id); }
 function findUserByName(name) { return DB.users.find(u => u.username === name); }
 
@@ -1576,7 +1576,9 @@ async function saveBill() {
     split = billDraft.customSplit || (p.members || []).slice();
   }
 
-  if (split.length === 0) return showToast('请选择至少一人分摊');
+  if (!split || split.length === 0) {
+    split = [DB.currentUser.id];
+  }
 
   // API模式
   if (API_TOKEN) {
